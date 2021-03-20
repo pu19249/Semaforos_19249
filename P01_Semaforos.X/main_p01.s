@@ -230,19 +230,19 @@ main:
     
 loop:
     ;hacer rutina para modo
-    BTFSS	estado, 0	;para que empiece en el modo_0 porque no esta seteado
+    BTFSC	estado, 0	;para que empiece en el modo_0 porque no esta seteado
     GOTO	modo_0	    
     
-    BTFSS	estado, 1	;si si esta seteado es porque vamos al modo 1
+    BTFSC	estado, 1	;si si esta seteado es porque vamos al modo 1
     GOTO	modo_1		
     
-    BTFSS	estado, 2	
+    BTFSC	estado, 2	
     GOTO	modo_2
     
-    BTFSS	estado, 3
+    BTFSC	estado, 3
     GOTO	modo_3
     
-    BTFSS	estado, 4
+    BTFSC	estado, 4
     GOTO	modo_4
     
 ;rutinas para indicar los modos con los leds
