@@ -2506,6 +2506,9 @@ ORG 00h ;posicion 0000h para el reset
 PSECT udata_bank0
  estado: DS 1
  transistores: DS 1
+ tiempo1: DS 1
+ tiempo2: DS 1
+
 PSECT udata_shr
  W_TEMP: DS 1
  STATUS_TEMP: DS 1
@@ -2529,23 +2532,47 @@ ISR: ;revision de los botones del puerto B
     BTFSS estado, 0
     GOTO modo_0_int
 
+    BTFSS estado, 1
+    GOTO modo_1_int
+
+
 modo_0_int:
-    BTFSS PORTB, 0
-
-    BTFSS PORTB, 1
+    BTFSS PORTB, 1 ;no hace nada en este caso, tampoco el boton 3
+    NOP
+    BTFSS PORTB, 2
+    NOP
+    BTFSS PORTB, 0 ;para ver si estando aqui cambio de modo
     BSF estado, 0 ;para que ya este como completado este modo
-
     BCF ((INTCON) and 07Fh), 0 ;limpiar la bandera de interrupcion
     GOTO POP
 
 
 modo_1_int:
-    BSF estado, 1
+    BTFSS PORTB, 1 ;esto incrementa el tiempo en v1
+    INCF tiempo1 ;incrementar variable para tiempo?
+    BTFSS PORTB, 2 ;esto decrementa el tiempo en v1
+    DECF tiempo1 ;decrementar variable para tiempo?
+    BTFSS PORTB, 0 ;para verificar el cambio de modo
+    BSF estado, 1 ;para que cuando regrese pueda ir al otro modo
+    BCF ((INTCON) and 07Fh), 0
+    GOTO POP
+
+
 modo_2_int:
+    BTFSS PORTB, 1
+    INCF tiempo2
+    BTFSS PORTB, 2
+    DECF tiempo2
+    BTFSS PORTB, 0
+    BSF estado, 2
+    BCF ((INTCON) and 07Fh), 0
+    GOTO POP
 
 modo_3_int:
 
 modo_4_int:
+
+
 
 POP:
     SWAPF STATUS_TEMP, W
@@ -2679,23 +2706,26 @@ main:
 
 loop:
     ;hacer rutina para modo
-    BTFSS estado, 0 ;para que empiece en el modo_0 porque no esta seteado
+    BTFSC estado, 0 ;para que empiece en el modo_0 porque no esta seteado
     GOTO modo_0
 
-    BTFSS estado, 1 ;si si esta seteado es porque vamos al modo 1
+    BTFSC estado, 1 ;si si esta seteado es porque vamos al modo 1
     GOTO modo_1
 
-    BTFSS estado, 2
+    BTFSC estado, 2
     GOTO modo_2
 
-    BTFSS estado, 3
+    BTFSC estado, 3
     GOTO modo_3
 
-    BTFSS estado, 4
+    BTFSC estado, 4
     GOTO modo_4
 
 ;rutinas para indicar los modos con los leds
 modo_0:
+    BCF PORTE, 0
+    BCF PORTE, 1
+    BCF PORTE, 2
     GOTO loop
 
 modo_1:
@@ -2709,7 +2739,6 @@ modo_2:
 
 modo_3:
     BSF PORTE, 0
-
     GOTO loop
 
 modo_4:
@@ -2729,7 +2758,7 @@ preparar_displays:
 
 multiplex:
     ;reiniciar timers
-    CLRF PORTE ;puerto con transistores
+    CLRF PORTD ;puerto con transistores
 
     BTFSC transistores, 0
     GOTO display2
@@ -2753,13 +2782,29 @@ multiplex:
     GOTO display8
 
 display1:
+    BSF PORTD, 0
+    GOTO next1
 display2:
+    BSF PORTD, 1
+    GOTO next2
 display3:
+    BSF PORTD, 2
+    GOTO next3
 display4:
+    BSF PORTD, 3
+    GOTO next4
 display5:
+    BSF PORTD, 4
+    GOTO next5
 display6:
+    BSF PORTD, 5
+    GOTO next6
 display7:
+    BSF PORTD, 6
+    GOTO next7
 display8:
+    BSF PORTD, 7
+    GOTO next8
 
 
 next1:
