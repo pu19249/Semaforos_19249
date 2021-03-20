@@ -2506,8 +2506,12 @@ ORG 00h ;posicion 0000h para el reset
 PSECT udata_bank0
  estado: DS 1
  transistores: DS 1
- tiempo1: DS 1
- tiempo2: DS 1
+ display: DS 8
+ tiempo1 EQU 10
+ tiempo2 EQU 10
+ tiempo3 EQU 10
+ decenas: DS 1
+ unidades: DS 1
 
 PSECT udata_shr
  W_TEMP: DS 1
@@ -2535,12 +2539,21 @@ ISR: ;revision de los botones del puerto B
     BTFSS estado, 1
     GOTO modo_1_int
 
+    BTFSS estado, 2
+    GOTO modo_2_int
+
+    BTFSS estado, 3
+    GOTO modo_3_int
+
+    BTFSS estado, 4
+    GOTO modo_4_int
 
 modo_0_int:
     BTFSS PORTB, 1 ;no hace nada en este caso, tampoco el boton 3
     NOP
     BTFSS PORTB, 2
     NOP
+    CALL normal
     BTFSS PORTB, 0 ;para ver si estando aqui cambio de modo
     BSF estado, 0 ;para que ya este como completado este modo
     BCF ((INTCON) and 07Fh), 0 ;limpiar la bandera de interrupcion
@@ -2548,10 +2561,7 @@ modo_0_int:
 
 
 modo_1_int:
-    BTFSS PORTB, 1 ;esto incrementa el tiempo en v1
-    INCF tiempo1 ;incrementar variable para tiempo?
-    BTFSS PORTB, 2 ;esto decrementa el tiempo en v1
-    DECF tiempo1 ;decrementar variable para tiempo?
+    CALL tiempov1
     BTFSS PORTB, 0 ;para verificar el cambio de modo
     BSF estado, 1 ;para que cuando regrese pueda ir al otro modo
     BCF ((INTCON) and 07Fh), 0
@@ -2559,18 +2569,29 @@ modo_1_int:
 
 
 modo_2_int:
-    BTFSS PORTB, 1
-    INCF tiempo2
-    BTFSS PORTB, 2
-    DECF tiempo2
+    CALL tiempov2
     BTFSS PORTB, 0
     BSF estado, 2
     BCF ((INTCON) and 07Fh), 0
     GOTO POP
 
 modo_3_int:
+    CALL tiempov3
+    BTFSS PORTB, 0
+    BSF estado, 3
+    BCF ((INTCON) and 07Fh), 0
+    GOTO POP
 
 modo_4_int:
+    BTFSS PORTB, 1
+    ;aceptar cambios
+    BTFSS PORTB, 2
+    ;rechazar cambios
+    BTFSS PORTB, 0
+    BSF estado, 4
+    BCF ((INTCON) and 07Fh), 0
+    GOTO POP
+
 
 
 
@@ -2748,13 +2769,97 @@ modo_4:
 ;===============================================================================
 ; SUBRUTINAS
 ;===============================================================================
+division_decenas:
+    CLRF decenas ;para asgurar que se inicia en cero el proceso
+    MOVLW 10 ;le resto una vez 100
+    SUBWF dividendo, 0 ;lo guardo en W
+    BTFSC STATUS, 0 ;Skip if clear, porque cuando haya un resultado valido se activara
+    INCF decenas ;cuantas centenas caben en el numero
+    BTFSC STATUS, 0 ;
+    MOVWF dividendo ;el resultado de la resta estaba en W ahora en dividendo
+    BTFSC STATUS, 0 ;un tercer BTFSC para ver hasta cuando repito la operacion o si sigue a decenas
+    GOTO $-7 ;se repite si cabe otra centena
+    CALL division_unidades
+    RETURN
+division_unidades:
+    CLRF unidades ;para asgurar que se inicia en cero el proceso
+    MOVLW 1 ;le resto una vez 100
+    SUBWF dividendo, F ;lo guardo en W
+    BTFSC STATUS, 0 ;Skip if clear, porque cuando haya un resultado valido se activara
+    INCF unidades ;cuantas centenas caben en el numero
+    BTFSS STATUS, 0 ;es cuando ya se completo el numero
+    RETURN
+    GOTO $-6 ;se repite si cabe otra centena
 
 preparar_displays:
+
+normal:
+    MOVLW 00000011B
+    CALL tabla_disp
+    MOVWF display+0
+    BTFSS ((INTCON) and 07Fh), 2 ;revisa el overflow del timer0
+    GOTO $-1
+    CALL int_t0
+
+tiempov1:
+    MOVF tiempo1, 0 ;mueve tiempo 1 a W
+    BTFSS PORTB, 1 ;boton de incrementar
+    CALL incrementar1
+    BTFSS PORTB, 2
+    CALL decrementar1
+    RETURN
+; ADDLW 1 ;suma 1 a tiempo1
+; ;ahora quiero asegurarme que no va a llegar mas alla de 20
+; MOVLW 20
+; SUBWF tiempo1
+; BTFSS STATUS, 2 ;mira si ya llego a 20
+; ;si ya llego a 20
+; ;si no ha llegado a 20
+;
+tiempov2:
+    MOVF tiempo2, 0 ;mueve tiempo2 a W
+    BTFSS PORTB, 1
+    CALL incrementar2
+    BTFSS PORTB, 2
+    CALL decrementar2
+    RETURN
+
+
+tiempov3:
+    MOVF tiempo3, 0 ;mueve tiempo3 a W
+    BTFSS PORTB, 1
+    CALL incrementar3
+    BTFSS PORTB, 2
+    CALL decrementar3
+    RETURN
+
+
+incrementar1:
+
+
+decrementar1:
+
+
+incrementar2:
+
+
+decrementar2:
+
+
+incrementar3:
+
+
+decrementar3:
+
 
 
 ;===============================================================================
 ; SUBRUTINAS DE INTERRUPCION
 ;===============================================================================
+
+int_t0:
+
+
 
 multiplex:
     ;reiniciar timers
@@ -2781,28 +2886,44 @@ multiplex:
     BTFSC transistores, 6
     GOTO display8
 
-display1:
+display1: ;parte decenas via1
+    MOVF display+0
+    MOVWF PORTC
     BSF PORTD, 0
     GOTO next1
-display2:
+display2: ;parte unidades via1
+    MOVF display+1
+    MOVWF PORTC
     BSF PORTD, 1
     GOTO next2
 display3:
+    MOVF display+2
+    MOVWF PORTC
     BSF PORTD, 2
     GOTO next3
 display4:
+    MOVF display+3
+    MOVWF PORTC
     BSF PORTD, 3
     GOTO next4
 display5:
+    MOVF display+4
+    MOVWF PORTC
     BSF PORTD, 4
     GOTO next5
 display6:
+    MOVF display+5
+    MOVWF PORTC
     BSF PORTD, 5
     GOTO next6
 display7:
+    MOVF display+6
+    MOVWF PORTC
     BSF PORTD, 6
     GOTO next7
 display8:
+    MOVF display+7
+    MOVWF PORTC
     BSF PORTD, 7
     GOTO next8
 
