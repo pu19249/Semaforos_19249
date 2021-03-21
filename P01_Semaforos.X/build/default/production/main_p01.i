@@ -2507,11 +2507,12 @@ PSECT udata_bank0
  estado: DS 1
  transistores: DS 1
  display: DS 8
- tiempo1 EQU 10
- tiempo2 EQU 10
- tiempo3 EQU 10
+ tiempo1: DS 1
+ tiempo2: DS 1
+ tiempo3: DS 1
  decenas: DS 1
  unidades: DS 1
+ dividendo: DS 1
 
 PSECT udata_shr
  W_TEMP: DS 1
@@ -2585,8 +2586,10 @@ modo_3_int:
 modo_4_int:
     BTFSS PORTB, 1
     ;aceptar cambios
+    CALL aceptar
     BTFSS PORTB, 2
     ;rechazar cambios
+    CALL normal ;regresa al modo de funcionamiento normal
     BTFSS PORTB, 0
     BSF estado, 4
     BCF ((INTCON) and 07Fh), 0
@@ -2770,6 +2773,8 @@ modo_4:
 ; SUBRUTINAS
 ;===============================================================================
 division_decenas:
+    MOVF tiempo1, 0
+    MOVWF dividendo ;para que me divida en centenas mi tiempo1
     CLRF decenas ;para asgurar que se inicia en cero el proceso
     MOVLW 10 ;le resto una vez 100
     SUBWF dividendo, 0 ;lo guardo en W
@@ -2794,29 +2799,21 @@ division_unidades:
 preparar_displays:
 
 normal:
-    MOVLW 00000011B
-    CALL tabla_disp
-    MOVWF display+0
-    BTFSS ((INTCON) and 07Fh), 2 ;revisa el overflow del timer0
-    GOTO $-1
-    CALL int_t0
+
 
 tiempov1:
+    MOVLW 10
+    MOVWF tiempo1
     MOVF tiempo1, 0 ;mueve tiempo 1 a W
     BTFSS PORTB, 1 ;boton de incrementar
     CALL incrementar1
     BTFSS PORTB, 2
     CALL decrementar1
     RETURN
-; ADDLW 1 ;suma 1 a tiempo1
-; ;ahora quiero asegurarme que no va a llegar mas alla de 20
-; MOVLW 20
-; SUBWF tiempo1
-; BTFSS STATUS, 2 ;mira si ya llego a 20
-; ;si ya llego a 20
-; ;si no ha llegado a 20
-;
+
 tiempov2:
+    MOVLW 10
+    MOVWF tiempo2
     MOVF tiempo2, 0 ;mueve tiempo2 a W
     BTFSS PORTB, 1
     CALL incrementar2
@@ -2826,6 +2823,8 @@ tiempov2:
 
 
 tiempov3:
+    MOVLW 10
+    MOVWF tiempo3
     MOVF tiempo3, 0 ;mueve tiempo3 a W
     BTFSS PORTB, 1
     CALL incrementar3
@@ -2835,24 +2834,65 @@ tiempov3:
 
 
 incrementar1:
-
+    ADDLW 1 ;le suma 1 al tiempo1
+    MOVLW 20
+    SUBWF tiempo1
+    BTFSS STATUS, 2 ;mira si ya llego a 20
+    BTFSS PORTB, 1 ;si ya llego a 20 y se presiona una vez mas regresa a 10
+    MOVLW 10 ;mueve 10 a tiempo1 (valor decimal)
+    MOVWF tiempo1
 
 decrementar1:
-
+    SUBLW 1 ;le resta 1 al tiempo1
+    MOVLW 10
+    SUBWF tiempo1
+    BTFSS STATUS, 2 ;mira si ya llego a 10
+    BTFSS PORTB, 2 ;si ya llego a 10 y se presiona una vez mas regresa a 20
+    MOVLW 20 ;mueve el valor de 20 a tiempo1 (valor decimal)
+    MOVWF tiempo1
 
 incrementar2:
-
+    ADDLW 1 ;le suma 1 al tiempo1
+    MOVLW 20
+    SUBWF tiempo2
+    BTFSS STATUS, 2 ;mira si ya llego a 20
+    BTFSS PORTB, 1 ;si ya llego a 20 y se presiona una vez mas regresa a 10
+    MOVLW 10 ;mueve 10 a tiempo1 (valor decimal)
+    MOVWF tiempo2
 
 decrementar2:
-
+    SUBLW 1 ;le resta 1 al tiempo1
+    MOVLW 10
+    SUBWF tiempo2
+    BTFSS STATUS, 2 ;mira si ya llego a 10
+    BTFSS PORTB, 2 ;si ya llego a 10 y se presiona una vez mas regresa a 20
+    MOVLW 20 ;mueve el valor de 20 a tiempo1 (valor decimal)
+    MOVWF tiempo2
 
 incrementar3:
-
+    ADDLW 1 ;le suma 1 al tiempo1
+    MOVLW 20
+    SUBWF tiempo3
+    BTFSS STATUS, 2 ;mira si ya llego a 20
+    BTFSS PORTB, 1 ;si ya llego a 20 y se presiona una vez mas regresa a 10
+    MOVLW 10 ;mueve 10 a tiempo1 (valor decimal)
+    MOVWF tiempo3
 
 decrementar3:
+    SUBLW 1 ;le resta 1 al tiempo1
+    MOVLW 10
+    SUBWF tiempo3
+    BTFSS STATUS, 2 ;mira si ya llego a 10
+    BTFSS PORTB, 2 ;si ya llego a 10 y se presiona una vez mas regresa a 20
+    MOVLW 20 ;mueve el valor de 20 a tiempo1 (valor decimal)
+    MOVWF tiempo3
 
 
-
+aceptar: ;en esta rutina se llaman todos los valores para los 7seg
+         ;y para los leds de los traffic lights
+    ;tiempo1
+    MOVF tiempo1, 0
+    ;MOVWF
 ;===============================================================================
 ; SUBRUTINAS DE INTERRUPCION
 ;===============================================================================

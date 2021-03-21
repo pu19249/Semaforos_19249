@@ -58,12 +58,18 @@ PSECT udata_bank0
 	estado:		    DS 1
 	transistores:	    DS 1
 	display:	    DS 8
-	tiempo1		    EQU 10
-	tiempo2		    EQU 10
-	tiempo3		    EQU	10
-	decenas:	    DS 1
-	unidades:	    DS 1
-	dividendo:	    DS 1
+	tiempo1:	    DS 1
+	tiempo2:	    DS 1
+	tiempo3:	    DS 1
+	decenas_t1:	    DS 1
+	unidades_t1:	    DS 1
+	dividendo_t1:	    DS 1
+	decenas_t2:	    DS 1
+	unidades_t2:	    DS 1
+	dividendo_t2:	    DS 1
+	unidades_t3:	    DS 1
+	decenas_t3:	    DS 1
+	dividendo_t3:	    DS 1
     
 PSECT udata_shr
 	W_TEMP:		    DS 1
@@ -137,8 +143,10 @@ modo_3_int:
 modo_4_int:
     BTFSS   PORTB, 1
     ;aceptar cambios
+    CALL    aceptar
     BTFSS   PORTB, 2
     ;rechazar cambios
+    CALL    normal	;regresa al modo de funcionamiento normal
     BTFSS   PORTB, 0
     BSF	    estado, 4
     BCF	    RBIF
@@ -317,58 +325,106 @@ modo_3:
 modo_4:
     BSF		PORTE, 2
     GOTO	loop
+    
+    CALL	division_decenas_t1
+    CALL	division_decenas_t2
+    CALL	division_decenas_t3
 
 ;===============================================================================
 ;			    SUBRUTINAS
 ;===============================================================================
-division_decenas:
-    CLRF	decenas	            ;para asgurar que se inicia en cero el proceso
+division_decenas_t1:
+    MOVF	tiempo1, 0
+    MOVWF	dividendo_t1	    ;para que me divida en centenas mi tiempo1		    
+    CLRF	decenas_t1	            ;para asgurar que se inicia en cero el proceso
     MOVLW	10		    ;le resto una vez 100
-    SUBWF	dividendo, 0	    ;lo guardo en W
+    SUBWF	dividendo_t1, 0	    ;lo guardo en W
     BTFSC	STATUS, 0	    ;Skip if clear, porque cuando haya un resultado valido se activara
-    INCF	decenas		    ;cuantas centenas caben en el numero
+    INCF	decenas_t1		    ;cuantas centenas caben en el numero
     BTFSC	STATUS, 0	    ;
-    MOVWF	dividendo	    ;el resultado de la resta estaba en W ahora en dividendo
+    MOVWF	dividendo_t1	    ;el resultado de la resta estaba en W ahora en dividendo
     BTFSC	STATUS, 0	    ;un tercer BTFSC para ver hasta cuando repito la operacion o si sigue a decenas
     GOTO	$-7		    ;se repite si cabe otra centena
-    CALL	division_unidades
+    CALL	division_unidades_t1
     RETURN
-division_unidades:
-    CLRF	unidades	    ;para asgurar que se inicia en cero el proceso
+division_unidades_t1:
+    CLRF	unidades_t1	    ;para asgurar que se inicia en cero el proceso
     MOVLW	1		    ;le resto una vez 100
-    SUBWF	dividendo, F	    ;lo guardo en W
+    SUBWF	dividendo_t1, F	    ;lo guardo en W
     BTFSC	STATUS, 0	    ;Skip if clear, porque cuando haya un resultado valido se activara
-    INCF	unidades	    ;cuantas centenas caben en el numero
+    INCF	unidades_t1	    ;cuantas centenas caben en el numero
     BTFSS	STATUS, 0	    ;es cuando ya se completo el numero     
     RETURN
     GOTO	$-6		    ;se repite si cabe otra centena
     
+division_decenas_t2:
+    MOVF	tiempo2, 0
+    MOVWF	dividendo_t2	    ;para que me divida en centenas mi tiempo1		    
+    CLRF	decenas_t2	            ;para asgurar que se inicia en cero el proceso
+    MOVLW	10		    ;le resto una vez 100
+    SUBWF	dividendo_t2, 0	    ;lo guardo en W
+    BTFSC	STATUS, 0	    ;Skip if clear, porque cuando haya un resultado valido se activara
+    INCF	decenas_t2		    ;cuantas centenas caben en el numero
+    BTFSC	STATUS, 0	    ;
+    MOVWF	dividendo_t2	    ;el resultado de la resta estaba en W ahora en dividendo
+    BTFSC	STATUS, 0	    ;un tercer BTFSC para ver hasta cuando repito la operacion o si sigue a decenas
+    GOTO	$-7		    ;se repite si cabe otra centena
+    CALL	division_unidades_t2
+    RETURN
+division_unidades_t2:
+    CLRF	unidades_t2	    ;para asgurar que se inicia en cero el proceso
+    MOVLW	1		    ;le resto una vez 100
+    SUBWF	dividendo_t2, F	    ;lo guardo en W
+    BTFSC	STATUS, 0	    ;Skip if clear, porque cuando haya un resultado valido se activara
+    INCF	unidades_t2	    ;cuantas centenas caben en el numero
+    BTFSS	STATUS, 0	    ;es cuando ya se completo el numero     
+    RETURN
+    GOTO	$-6		    ;se repite si cabe otra centena
+    
+    
+division_decenas_t3:
+    MOVF	tiempo3, 0
+    MOVWF	dividendo_t3	    ;para que me divida en centenas mi tiempo1		    
+    CLRF	decenas_t3	            ;para asgurar que se inicia en cero el proceso
+    MOVLW	10		    ;le resto una vez 100
+    SUBWF	dividendo_t3, 0	    ;lo guardo en W
+    BTFSC	STATUS, 0	    ;Skip if clear, porque cuando haya un resultado valido se activara
+    INCF	decenas_t3		    ;cuantas centenas caben en el numero
+    BTFSC	STATUS, 0	    ;
+    MOVWF	dividendo_t3	    ;el resultado de la resta estaba en W ahora en dividendo
+    BTFSC	STATUS, 0	    ;un tercer BTFSC para ver hasta cuando repito la operacion o si sigue a decenas
+    GOTO	$-7		    ;se repite si cabe otra centena
+    CALL	division_unidades_t3
+    RETURN
+division_unidades_t3:
+    CLRF	unidades_t3	    ;para asgurar que se inicia en cero el proceso
+    MOVLW	1		    ;le resto una vez 100
+    SUBWF	dividendo_t3, F	    ;lo guardo en W
+    BTFSC	STATUS, 0	    ;Skip if clear, porque cuando haya un resultado valido se activara
+    INCF	unidades_t3	    ;cuantas centenas caben en el numero
+    BTFSS	STATUS, 0	    ;es cuando ya se completo el numero     
+    RETURN
+    GOTO	$-6		    ;se repite si cabe otra centena
+    
+    
 preparar_displays:
     
 normal:
-    MOVLW   00000011B
-    CALL    tabla_disp
-    MOVWF   display+0
-    BTFSS   T0IF	;revisa el overflow del timer0
-    GOTO    $-1
-    CALL    int_t0
+    
     
 tiempov1:
+    MOVLW   10
+    MOVWF   tiempo1
     MOVF    tiempo1, 0	;mueve tiempo 1 a W
     BTFSS   PORTB, 1	;boton de incrementar
     CALL    incrementar1
     BTFSS   PORTB, 2
     CALL    decrementar1
     RETURN
-;    ADDLW   1		;suma 1 a tiempo1
-;    ;ahora quiero asegurarme que no va a llegar mas alla de 20
-;    MOVLW   20		
-;    SUBWF   tiempo1
-;    BTFSS   STATUS, 2	;mira si ya llego a 20
-;    		;si ya llego a 20
-;			;si no ha llegado a 20
-;   
+   
 tiempov2:
+    MOVLW   10
+    MOVWF   tiempo2
     MOVF    tiempo2, 0	;mueve tiempo2 a W
     BTFSS   PORTB, 1
     CALL    incrementar2
@@ -378,6 +434,8 @@ tiempov2:
     
     
 tiempov3:
+    MOVLW   10
+    MOVWF   tiempo3
     MOVF    tiempo3, 0	;mueve tiempo3 a W
     BTFSS   PORTB, 1
     CALL    incrementar3
@@ -387,24 +445,65 @@ tiempov3:
     
 
 incrementar1:
-    
+    ADDLW   1		;le suma 1 al tiempo1
+    MOVLW   20
+    SUBWF   tiempo1
+    BTFSS   STATUS, 2	;mira si ya llego a 20
+    BTFSS   PORTB, 1	;si ya llego a 20 y se presiona una vez mas regresa a 10
+    MOVLW   10		;mueve 10 a tiempo1 (valor decimal)
+    MOVWF   tiempo1
     
 decrementar1:
-    
+    SUBLW   1		;le resta 1 al tiempo1
+    MOVLW   10
+    SUBWF   tiempo1
+    BTFSS   STATUS, 2	;mira si ya llego a 10
+    BTFSS   PORTB, 2	;si ya llego a 10 y se presiona una vez mas regresa a 20
+    MOVLW   20		;mueve el valor de 20 a tiempo1 (valor decimal)
+    MOVWF   tiempo1
     
 incrementar2:
-    
+    ADDLW   1		;le suma 1 al tiempo1
+    MOVLW   20
+    SUBWF   tiempo2
+    BTFSS   STATUS, 2	;mira si ya llego a 20
+    BTFSS   PORTB, 1	;si ya llego a 20 y se presiona una vez mas regresa a 10
+    MOVLW   10		;mueve 10 a tiempo1 (valor decimal)
+    MOVWF   tiempo2
     
 decrementar2:
-    
+    SUBLW   1		;le resta 1 al tiempo1
+    MOVLW   10
+    SUBWF   tiempo2
+    BTFSS   STATUS, 2	;mira si ya llego a 10
+    BTFSS   PORTB, 2	;si ya llego a 10 y se presiona una vez mas regresa a 20
+    MOVLW   20		;mueve el valor de 20 a tiempo1 (valor decimal)
+    MOVWF   tiempo2
     
 incrementar3:
-    
+    ADDLW   1		;le suma 1 al tiempo1
+    MOVLW   20
+    SUBWF   tiempo3
+    BTFSS   STATUS, 2	;mira si ya llego a 20
+    BTFSS   PORTB, 1	;si ya llego a 20 y se presiona una vez mas regresa a 10
+    MOVLW   10		;mueve 10 a tiempo1 (valor decimal)
+    MOVWF   tiempo3
     
 decrementar3:
+    SUBLW   1		;le resta 1 al tiempo1
+    MOVLW   10
+    SUBWF   tiempo3
+    BTFSS   STATUS, 2	;mira si ya llego a 10
+    BTFSS   PORTB, 2	;si ya llego a 10 y se presiona una vez mas regresa a 20
+    MOVLW   20		;mueve el valor de 20 a tiempo1 (valor decimal)
+    MOVWF   tiempo3
     
     
-    
+aceptar:	       ;en esta rutina se llaman todos los valores para los 7seg
+		       ;y para los leds de los traffic lights
+    ;tiempo1
+    MOVF    tiempo1, 0
+    ;MOVWF   
 ;===============================================================================
 ;			    SUBRUTINAS DE INTERRUPCION				
 ;===============================================================================
