@@ -2537,59 +2537,59 @@ PUSH:
     MOVWF STATUS_TEMP
 
 ISR: ;revision de los botones del puerto B
-    BTFSC ((INTCON) and 07Fh), 0 ;hubo botonazo en el puerto B
+    BTFSS ((INTCON) and 07Fh), 0 ;hubo botonazo en el puerto B
     GOTO POP ;por si no hubo interrupcion
 
-    BTFSC estado, 0
-    GOTO normal
+    BTFSS estado, 0
+    GOTO modo_0_int
 
-    BTFSC estado, 1
-    GOTO config_v1
+    BTFSS estado, 1
+    GOTO modo_1_int
 
-    BTFSC estado, 2
-    GOTO config_v2
+    BTFSS estado, 2
+    GOTO modo_2_int
 
-    BTFSC estado, 3
-    GOTO config_v3
+    BTFSS estado, 3
+    GOTO modo_3_int
 
-    BTFSC estado, 4
-    GOTO aceptar_rechazar
+    BTFSS estado, 4
+    GOTO modo_4_int
 
-;modo_0_int:
-; BTFSS PORTB, 1 ;no hace nada en este caso, tampoco el boton 3
-; NOP
-; BTFSS PORTB, 2
-; NOP
-; CALL normal
-; BTFSS PORTB, 0 ;para ver si estando aqui cambio de modo
-; BSF estado, 0 ;para que ya este como completado este modo
-; BCF ((INTCON) and 07Fh), 0 ;limpiar la bandera de interrupcion
-; GOTO POP
-;
-;
-;modo_1_int:
-; CALL tiempov1
-; BTFSS PORTB, 0 ;para verificar el cambio de modo
-; BSF estado, 1 ;para que cuando regrese pueda ir al otro modo
-; BCF ((INTCON) and 07Fh), 0
-; GOTO POP
-;
-;
-;modo_2_int:
-; CALL tiempov2
-; BTFSS PORTB, 0
-; BSF estado, 2
-; BCF ((INTCON) and 07Fh), 0
-; GOTO POP
-;
-;modo_3_int:
-; CALL tiempov3
-; BTFSS PORTB, 0
-; BSF estado, 3
-; BCF ((INTCON) and 07Fh), 0
-; GOTO POP
-;
-;modo_4_int:
+modo_0_int:
+    BTFSS PORTB, 1 ;no hace nada en este caso, tampoco el boton 3
+    NOP
+    BTFSS PORTB, 2
+    NOP
+    ;CALL normal
+    BTFSS PORTB, 0 ;para ver si estando aqui cambio de modo
+    BSF estado, 0 ;para que ya este como completado este modo
+    BCF ((INTCON) and 07Fh), 0 ;limpiar la bandera de interrupcion
+    GOTO POP
+
+
+modo_1_int:
+    CALL config_v1
+    BTFSS PORTB, 0 ;para verificar el cambio de modo
+    BSF estado, 1 ;para que cuando regrese pueda ir al otro modo
+    BCF ((INTCON) and 07Fh), 0
+    GOTO POP
+
+
+modo_2_int:
+    CALL config_v2
+    BTFSS PORTB, 0
+    BSF estado, 2
+    BCF ((INTCON) and 07Fh), 0
+    GOTO POP
+
+modo_3_int:
+    CALL config_v3
+    BTFSS PORTB, 0
+    BSF estado, 3
+    BCF ((INTCON) and 07Fh), 0
+    GOTO POP
+
+modo_4_int:
 ; BTFSS PORTB, 1
 ; ;aceptar cambios
 ; CALL aceptar
@@ -2599,9 +2599,9 @@ ISR: ;revision de los botones del puerto B
 ; BTFSS PORTB, 0
 ; BSF estado, 4
 ; BCF ((INTCON) and 07Fh), 0
-; GOTO POP
-;
-;
+    GOTO POP
+
+
 
 
 POP:
@@ -2646,6 +2646,7 @@ tabla_disp: ;tabla para el display de 7seg
 ;===============================================================================
 ; CONFIGURACION DE PUERTOS
 ;===============================================================================
+
 
 main:
     ;configuracion del puerto B (botones y semaforo via 3)
@@ -2730,6 +2731,7 @@ main:
     CLRF PORTD
     CLRF PORTE
 
+
 ;===============================================================================
 ; LOOP PRINCIPAL
 ;===============================================================================
@@ -2737,7 +2739,20 @@ main:
 loop:
     ;CALL normal ;comienza en el modo normal
     CALL multiplex ;para que esten multiplexeando siempre los disp
+    BTFSS estado, 0
+    GOTO modo_normal
 
+    BTFSS estado, 1
+    GOTO via1
+
+    BTFSS estado, 2
+    GOTO via2
+
+    BTFSS estado, 3
+    GOTO via3
+
+    BTFSS estado, 4
+    GOTO aceptar
 
     GOTO loop
 ;===============================================================================
@@ -2818,7 +2833,35 @@ division_unidades_t3:
     GOTO $-6 ;se repite si cabe otra centena
 
 
+modo_normal:
+    BSF PORTE, 0
+    BCF PORTE, 1
+    BCF PORTE, 2
+    GOTO loop
 
+via1:
+    BCF PORTE, 0
+    BSF PORTE, 1
+    BCF PORTE, 2
+    GOTO loop
+
+via2:
+    BSF PORTE, 0
+    BSF PORTE, 1
+    BCF PORTE, 2
+    GOTO loop
+
+via3:
+    BCF PORTE, 0
+    BCF PORTE, 1
+    BSF PORTE, 2
+    GOTO loop
+
+aceptar:
+    BSF PORTE, 0
+    BCF PORTE, 1
+    BSF PORTE, 2
+    GOTO loop
 ;preparar_displays:
 ;
 normal:
@@ -2936,9 +2979,9 @@ decrementar3:
 ;===============================================================================
 
 config_v1:
-    BCF PORTE, 0
-    BSF PORTE, 1
-    BCF PORTE, 2
+; BCF PORTE, 0
+; BSF PORTE, 1
+; BCF PORTE, 2
     MOVLW 10 ;mueve el valor decimal al tiempo1
     MOVWF tiempo1 ;
     BTFSS PORTB, 1 ;se revisa si se quiere incrementar el tiempo1
@@ -2952,9 +2995,9 @@ config_v1:
 
 
 config_v2:
-    BSF PORTE, 0
-    BSF PORTE, 1
-    BCF PORTE, 2
+; BSF PORTE, 0
+; BSF PORTE, 1
+; BCF PORTE, 2
     MOVLW 10
     MOVWF tiempo2
     BTFSS PORTB, 1
@@ -2967,9 +3010,9 @@ config_v2:
     GOTO POP
 
 config_v3:
-    BCF PORTE, 0
-    BCF PORTE, 1
-    BSF PORTE, 2
+; BCF PORTE, 0
+; BCF PORTE, 1
+; BSF PORTE, 2
     MOVLW 10
     MOVWF tiempo3
     BTFSS PORTB, 1
@@ -2983,12 +3026,12 @@ config_v3:
 
 
 aceptar_rechazar:
-    BSF PORTE, 0
-    BCF PORTE, 1
-    BSF PORTE, 2
-    ;BTFSS PORTB, 0
-    ;CALL normal
-    RETURN
+; BSF PORTE, 0
+; BCF PORTE, 1
+; BSF PORTE, 2
+; BTFSS PORTB, 0
+; CALL normal
+    GOTO POP
 
 
 multiplex:
