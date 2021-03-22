@@ -89,26 +89,23 @@ PUSH:
     
 ISR: ;revision de los botones del puerto B
     BTFSC    RBIF		    ;hubo botonazo en el puerto B
-    CALL     seleccion_modo
-    ;CALL     multiplex
-;    BTFSC   RBIF
-;    GOTO    POP		    ;por si no hubo interrupcion
-;    
-;    BTFSS   estado, 0
-;    GOTO    modo_0_int
-;
-;    BTFSS   estado, 1
-;    GOTO    modo_1_int
-;    
-;    BTFSS   estado, 2
-;    GOTO    modo_2_int
-;    
-;    BTFSS   estado, 3
-;    GOTO    modo_3_int
-;    
-;    BTFSS   estado, 4
-;    GOTO    modo_4_int
-;    
+    GOTO    POP			    ;por si no hubo interrupcion
+    
+    BTFSC   estado, 0
+    GOTO    normal
+
+    BTFSC   estado, 1
+    GOTO    config_v1
+    
+    BTFSC   estado, 2
+    GOTO    config_v2
+    
+    BTFSC   estado, 3
+    GOTO    config_v3
+    
+    BTFSC   estado, 4
+    GOTO    aceptar_rechazar
+    
 ;modo_0_int:
 ;    BTFSS   PORTB, 1	    ;no hace nada en este caso, tampoco el boton 3
 ;    NOP
@@ -291,6 +288,8 @@ main:
 loop:
     ;CALL	normal		;comienza en el modo normal
     CALL	multiplex	;para que esten multiplexeando siempre los disp
+    
+    
     GOTO	loop
 ;===============================================================================
 ;			    SUBRUTINAS
@@ -487,20 +486,6 @@ decrementar3:
 ;			    SUBRUTINAS DE INTERRUPCION				
 ;===============================================================================
 
-seleccion_modo:
-    BTFSS	PORTB, 0	;revisa si se presiono el boton de modo
-    CALL	config_v1	;nos lleva a la configuracion de la via1
-    ;BTFSS	PORTB, 0	;revisa si se presiono de nuevo el boton
-    ;CALL	config_v2	;nos lleva a la configuracion de la via2
-    ;BTFSS	PORTB, 0	;revisa si se presiono de nuevo el boton
-    ;CALL	config_v3	;nos lleva a la configuracion de la via3
-    ;BTFSS	PORTB, 0	;nos lleva a aceptar/rechazar
-    ;CALL	aceptar_rechazar
-    ;BTFSS	PORTB, 0	;nos regresa al modo normal
-    ;CALL	normal
-    RETURN
-   
-    
 config_v1:
     BCF		PORTE, 0
     BSF		PORTE, 1
@@ -508,12 +493,14 @@ config_v1:
     MOVLW	10		;mueve el valor decimal al tiempo1
     MOVWF	tiempo1		;
     BTFSS	PORTB, 1	;se revisa si se quiere incrementar el tiempo1
-    CALL	incrementar1	;
+    GOTO	incrementar1	;
     BTFSS	PORTB, 2
-    CALL	decrementar1	;sino se va a decrementar el tiempo 1
+    GOTO	decrementar1	;sino se va a decrementar el tiempo 1
     BTFSS	PORTB, 0
-    CALL	config_v2	;sino sigue con la rutina 
-    RETURN			
+    BSF		estado, 1
+    BCF		RBIF
+    GOTO	POP
+    			
     
 config_v2:
     BSF		PORTE, 0
@@ -522,12 +509,13 @@ config_v2:
     MOVLW	10
     MOVWF	tiempo2
     BTFSS	PORTB, 1
-    CALL	incrementar2
+    GOTO  	incrementar2
     BTFSS	PORTB, 2
-    CALL	decrementar2
+    GOTO   	decrementar2
     BTFSS	PORTB, 0
-    CALL	config_v3
-    RETURN
+    BSF		estado, 2
+    BCF		RBIF
+    GOTO	POP
     
 config_v3:
     BCF		PORTE, 0
@@ -536,12 +524,13 @@ config_v3:
     MOVLW	10
     MOVWF	tiempo3
     BTFSS	PORTB, 1
-    CALL	incrementar3
+    GOTO	incrementar3
     BTFSS	PORTB, 2
-    CALL	decrementar3
+    GOTO	decrementar3
     BTFSS	PORTB, 0
-    CALL	aceptar_rechazar
-    RETURN
+    BSF		estado, 3
+    BCF		RBIF
+    GOTO	POP
     
 
 aceptar_rechazar:
