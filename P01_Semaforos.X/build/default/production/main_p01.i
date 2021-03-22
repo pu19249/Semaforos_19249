@@ -2510,9 +2510,15 @@ PSECT udata_bank0
  tiempo1: DS 1
  tiempo2: DS 1
  tiempo3: DS 1
- decenas: DS 1
- unidades: DS 1
- dividendo: DS 1
+ decenas_t1: DS 1
+ unidades_t1: DS 1
+ dividendo_t1: DS 1
+ decenas_t2: DS 1
+ unidades_t2: DS 1
+ dividendo_t2: DS 1
+ unidades_t3: DS 1
+ decenas_t3: DS 1
+ dividendo_t3: DS 1
 
 PSECT udata_shr
  W_TEMP: DS 1
@@ -2531,71 +2537,74 @@ PUSH:
     MOVWF STATUS_TEMP
 
 ISR: ;revision de los botones del puerto B
-    BTFSC ((INTCON) and 07Fh), 0
-    GOTO POP ;por si no hubo interrupcion
-
-    BTFSS estado, 0
-    GOTO modo_0_int
-
-    BTFSS estado, 1
-    GOTO modo_1_int
-
-    BTFSS estado, 2
-    GOTO modo_2_int
-
-    BTFSS estado, 3
-    GOTO modo_3_int
-
-    BTFSS estado, 4
-    GOTO modo_4_int
-
-modo_0_int:
-    BTFSS PORTB, 1 ;no hace nada en este caso, tampoco el boton 3
-    NOP
-    BTFSS PORTB, 2
-    NOP
-    CALL normal
-    BTFSS PORTB, 0 ;para ver si estando aqui cambio de modo
-    BSF estado, 0 ;para que ya este como completado este modo
-    BCF ((INTCON) and 07Fh), 0 ;limpiar la bandera de interrupcion
-    GOTO POP
-
-
-modo_1_int:
-    CALL tiempov1
-    BTFSS PORTB, 0 ;para verificar el cambio de modo
-    BSF estado, 1 ;para que cuando regrese pueda ir al otro modo
-    BCF ((INTCON) and 07Fh), 0
-    GOTO POP
-
-
-modo_2_int:
-    CALL tiempov2
-    BTFSS PORTB, 0
-    BSF estado, 2
-    BCF ((INTCON) and 07Fh), 0
-    GOTO POP
-
-modo_3_int:
-    CALL tiempov3
-    BTFSS PORTB, 0
-    BSF estado, 3
-    BCF ((INTCON) and 07Fh), 0
-    GOTO POP
-
-modo_4_int:
-    BTFSS PORTB, 1
-    ;aceptar cambios
-    CALL aceptar
-    BTFSS PORTB, 2
-    ;rechazar cambios
-    CALL normal ;regresa al modo de funcionamiento normal
-    BTFSS PORTB, 0
-    BSF estado, 4
-    BCF ((INTCON) and 07Fh), 0
-    GOTO POP
-
-
+    BTFSC ((INTCON) and 07Fh), 0 ;hubo botonazo en el puerto B
+    CALL seleccion_modo
+    ;CALL multiplex
+; BTFSC ((INTCON) and 07Fh), 0
+; GOTO POP ;por si no hubo interrupcion
+;
+; BTFSS estado, 0
+; GOTO modo_0_int
+;
+; BTFSS estado, 1
+; GOTO modo_1_int
+;
+; BTFSS estado, 2
+; GOTO modo_2_int
+;
+; BTFSS estado, 3
+; GOTO modo_3_int
+;
+; BTFSS estado, 4
+; GOTO modo_4_int
+;
+;modo_0_int:
+; BTFSS PORTB, 1 ;no hace nada en este caso, tampoco el boton 3
+; NOP
+; BTFSS PORTB, 2
+; NOP
+; CALL normal
+; BTFSS PORTB, 0 ;para ver si estando aqui cambio de modo
+; BSF estado, 0 ;para que ya este como completado este modo
+; BCF ((INTCON) and 07Fh), 0 ;limpiar la bandera de interrupcion
+; GOTO POP
+;
+;
+;modo_1_int:
+; CALL tiempov1
+; BTFSS PORTB, 0 ;para verificar el cambio de modo
+; BSF estado, 1 ;para que cuando regrese pueda ir al otro modo
+; BCF ((INTCON) and 07Fh), 0
+; GOTO POP
+;
+;
+;modo_2_int:
+; CALL tiempov2
+; BTFSS PORTB, 0
+; BSF estado, 2
+; BCF ((INTCON) and 07Fh), 0
+; GOTO POP
+;
+;modo_3_int:
+; CALL tiempov3
+; BTFSS PORTB, 0
+; BSF estado, 3
+; BCF ((INTCON) and 07Fh), 0
+; GOTO POP
+;
+;modo_4_int:
+; BTFSS PORTB, 1
+; ;aceptar cambios
+; CALL aceptar
+; BTFSS PORTB, 2
+; ;rechazar cambios
+; CALL normal ;regresa al modo de funcionamiento normal
+; BTFSS PORTB, 0
+; BSF estado, 4
+; BCF ((INTCON) and 07Fh), 0
+; GOTO POP
+;
+;
 
 
 POP:
@@ -2729,103 +2738,254 @@ main:
 ;===============================================================================
 
 loop:
-    ;hacer rutina para modo
-    BTFSC estado, 0 ;para que empiece en el modo_0 porque no esta seteado
-    GOTO modo_0
-
-    BTFSC estado, 1 ;si si esta seteado es porque vamos al modo 1
-    GOTO modo_1
-
-    BTFSC estado, 2
-    GOTO modo_2
-
-    BTFSC estado, 3
-    GOTO modo_3
-
-    BTFSC estado, 4
-    GOTO modo_4
-
-;rutinas para indicar los modos con los leds
-modo_0:
-    BCF PORTE, 0
-    BCF PORTE, 1
-    BCF PORTE, 2
+    ;CALL normal ;comienza en el modo normal
+    CALL multiplex ;para que esten multiplexeando siempre los disp
     GOTO loop
-
-modo_1:
-    BSF PORTE, 0
-    GOTO loop
-
-modo_2:
-    BCF PORTE, 0
-    BSF PORTE, 1
-    GOTO loop
-
-modo_3:
-    BSF PORTE, 0
-    GOTO loop
-
-modo_4:
-    BSF PORTE, 2
-    GOTO loop
-
 ;===============================================================================
 ; SUBRUTINAS
 ;===============================================================================
-division_decenas:
+
+division_decenas_t1:
     MOVF tiempo1, 0
-    MOVWF dividendo ;para que me divida en centenas mi tiempo1
-    CLRF decenas ;para asgurar que se inicia en cero el proceso
+    MOVWF dividendo_t1 ;para que me divida en centenas mi tiempo1
+    CLRF decenas_t1 ;para asgurar que se inicia en cero el proceso
     MOVLW 10 ;le resto una vez 100
-    SUBWF dividendo, 0 ;lo guardo en W
+    SUBWF dividendo_t1, 0 ;lo guardo en W
     BTFSC STATUS, 0 ;Skip if clear, porque cuando haya un resultado valido se activara
-    INCF decenas ;cuantas centenas caben en el numero
+    INCF decenas_t1 ;cuantas centenas caben en el numero
     BTFSC STATUS, 0 ;
-    MOVWF dividendo ;el resultado de la resta estaba en W ahora en dividendo
+    MOVWF dividendo_t1 ;el resultado de la resta estaba en W ahora en dividendo
     BTFSC STATUS, 0 ;un tercer BTFSC para ver hasta cuando repito la operacion o si sigue a decenas
     GOTO $-7 ;se repite si cabe otra centena
-    CALL division_unidades
+    CALL division_unidades_t1
     RETURN
-division_unidades:
-    CLRF unidades ;para asgurar que se inicia en cero el proceso
+division_unidades_t1:
+    CLRF unidades_t1 ;para asgurar que se inicia en cero el proceso
     MOVLW 1 ;le resto una vez 100
-    SUBWF dividendo, F ;lo guardo en W
+    SUBWF dividendo_t1, F ;lo guardo en W
     BTFSC STATUS, 0 ;Skip if clear, porque cuando haya un resultado valido se activara
-    INCF unidades ;cuantas centenas caben en el numero
+    INCF unidades_t1 ;cuantas centenas caben en el numero
     BTFSS STATUS, 0 ;es cuando ya se completo el numero
     RETURN
     GOTO $-6 ;se repite si cabe otra centena
 
-preparar_displays:
+division_decenas_t2:
+    MOVF tiempo2, 0
+    MOVWF dividendo_t2 ;para que me divida en centenas mi tiempo1
+    CLRF decenas_t2 ;para asgurar que se inicia en cero el proceso
+    MOVLW 10 ;le resto una vez 100
+    SUBWF dividendo_t2, 0 ;lo guardo en W
+    BTFSC STATUS, 0 ;Skip if clear, porque cuando haya un resultado valido se activara
+    INCF decenas_t2 ;cuantas centenas caben en el numero
+    BTFSC STATUS, 0 ;
+    MOVWF dividendo_t2 ;el resultado de la resta estaba en W ahora en dividendo
+    BTFSC STATUS, 0 ;un tercer BTFSC para ver hasta cuando repito la operacion o si sigue a decenas
+    GOTO $-7 ;se repite si cabe otra centena
+    CALL division_unidades_t2
+    RETURN
+division_unidades_t2:
+    CLRF unidades_t2 ;para asgurar que se inicia en cero el proceso
+    MOVLW 1 ;le resto una vez 100
+    SUBWF dividendo_t2, F ;lo guardo en W
+    BTFSC STATUS, 0 ;Skip if clear, porque cuando haya un resultado valido se activara
+    INCF unidades_t2 ;cuantas centenas caben en el numero
+    BTFSS STATUS, 0 ;es cuando ya se completo el numero
+    RETURN
+    GOTO $-6 ;se repite si cabe otra centena
 
+
+division_decenas_t3:
+    MOVF tiempo3, 0
+    MOVWF dividendo_t3 ;para que me divida en centenas mi tiempo1
+    CLRF decenas_t3 ;para asgurar que se inicia en cero el proceso
+    MOVLW 10 ;le resto una vez 100
+    SUBWF dividendo_t3, 0 ;lo guardo en W
+    BTFSC STATUS, 0 ;Skip if clear, porque cuando haya un resultado valido se activara
+    INCF decenas_t3 ;cuantas centenas caben en el numero
+    BTFSC STATUS, 0 ;
+    MOVWF dividendo_t3 ;el resultado de la resta estaba en W ahora en dividendo
+    BTFSC STATUS, 0 ;un tercer BTFSC para ver hasta cuando repito la operacion o si sigue a decenas
+    GOTO $-7 ;se repite si cabe otra centena
+    CALL division_unidades_t3
+    RETURN
+division_unidades_t3:
+    CLRF unidades_t3 ;para asgurar que se inicia en cero el proceso
+    MOVLW 1 ;le resto una vez 100
+    SUBWF dividendo_t3, F ;lo guardo en W
+    BTFSC STATUS, 0 ;Skip if clear, porque cuando haya un resultado valido se activara
+    INCF unidades_t3 ;cuantas centenas caben en el numero
+    BTFSS STATUS, 0 ;es cuando ya se completo el numero
+    RETURN
+    GOTO $-6 ;se repite si cabe otra centena
+
+
+
+;preparar_displays:
+;
 normal:
-
-
-tiempov1:
-    MOVLW 10
-    MOVWF tiempo1
-    MOVF tiempo1, 0 ;mueve tiempo 1 a W
-    BTFSS PORTB, 1 ;boton de incrementar
-    CALL incrementar1
-    BTFSS PORTB, 2
-    CALL decrementar1
     RETURN
 
-tiempov2:
+
+
+incrementar1:
+    INCF tiempo1 ;le suma 1 al tiempo1
+    MOVLW 20
+    SUBWF tiempo1
+    BTFSS STATUS, 2 ;mira si ya llego a 20
+    BTFSS PORTB, 1 ;si ya llego a 20 y se presiona una vez mas regresa a 10
+    MOVLW 10 ;mueve 10 a tiempo1 (valor decimal)
+    MOVWF tiempo1
+    CALL division_decenas_t1
+    MOVF decenas_t1
+    CALL tabla_disp
+    MOVWF display+0
+    MOVF unidades_t1
+    CALL tabla_disp
+    MOVWF display+1
+    RETURN
+
+decrementar1:
+    DECF tiempo1 ;le resta 1 al tiempo1
+    MOVLW 10
+    SUBWF tiempo1
+    BTFSS STATUS, 2 ;mira si ya llego a 10
+    BTFSS PORTB, 2 ;si ya llego a 10 y se presiona una vez mas regresa a 20
+    MOVLW 20 ;mueve el valor de 20 a tiempo1 (valor decimal)
+    MOVWF tiempo1
+    CALL division_decenas_t1
+    MOVF decenas_t1
+    CALL tabla_disp
+    MOVWF display+0
+    MOVF unidades_t1
+    CALL tabla_disp
+    MOVWF display+1
+    RETURN
+
+incrementar2:
+    INCF tiempo2 ;le suma 1 al tiempo1
+    MOVLW 20
+    SUBWF tiempo2
+    BTFSS STATUS, 2 ;mira si ya llego a 20
+    BTFSS PORTB, 1 ;si ya llego a 20 y se presiona una vez mas regresa a 10
+    MOVLW 10 ;mueve 10 a tiempo1 (valor decimal)
+    MOVWF tiempo2
+    CALL division_decenas_t2
+    MOVF decenas_t2
+    CALL tabla_disp
+    MOVWF display+0
+    MOVF unidades_t2
+    CALL tabla_disp
+    MOVWF display+1
+    RETURN
+
+decrementar2:
+    DECF tiempo2 ;le resta 1 al tiempo1
+    MOVLW 10
+    SUBWF tiempo2
+    BTFSS STATUS, 2 ;mira si ya llego a 10
+    BTFSS PORTB, 2 ;si ya llego a 10 y se presiona una vez mas regresa a 20
+    MOVLW 20 ;mueve el valor de 20 a tiempo1 (valor decimal)
+    MOVWF tiempo2
+    CALL division_decenas_t2
+    MOVF decenas_t2
+    CALL tabla_disp
+    MOVWF display+0
+    MOVF unidades_t2
+    CALL tabla_disp
+    MOVWF display+1
+    RETURN
+
+incrementar3:
+    INCF tiempo3 ;le suma 1 al tiempo1
+    MOVLW 20
+    SUBWF tiempo3
+    BTFSS STATUS, 2 ;mira si ya llego a 20
+    BTFSS PORTB, 1 ;si ya llego a 20 y se presiona una vez mas regresa a 10
+    MOVLW 10 ;mueve 10 a tiempo1 (valor decimal)
+    MOVWF tiempo3
+    CALL division_decenas_t3
+    MOVF decenas_t3
+    CALL tabla_disp
+    MOVWF display+0
+    MOVF unidades_t3
+    CALL tabla_disp
+    MOVWF display+1
+    RETURN
+
+decrementar3:
+    DECF tiempo3 ;le resta 1 al tiempo1
+    MOVLW 10
+    SUBWF tiempo3
+    BTFSS STATUS, 2 ;mira si ya llego a 10
+    BTFSS PORTB, 2 ;si ya llego a 10 y se presiona una vez mas regresa a 20
+    MOVLW 20 ;mueve el valor de 20 a tiempo1 (valor decimal)
+    MOVWF tiempo3
+    CALL division_decenas_t3
+    MOVF decenas_t3
+    CALL tabla_disp
+    MOVWF display+0
+    MOVF unidades_t3
+    CALL tabla_disp
+    MOVWF display+1
+    RETURN
+
+
+
+
+;===============================================================================
+; SUBRUTINAS DE INTERRUPCION
+;===============================================================================
+
+seleccion_modo:
+    BTFSS PORTB, 0 ;revisa si se presiono el boton de modo
+    CALL config_v1 ;nos lleva a la configuracion de la via1
+    ;BTFSS PORTB, 0 ;revisa si se presiono de nuevo el boton
+    ;CALL config_v2 ;nos lleva a la configuracion de la via2
+    ;BTFSS PORTB, 0 ;revisa si se presiono de nuevo el boton
+    ;CALL config_v3 ;nos lleva a la configuracion de la via3
+    ;BTFSS PORTB, 0 ;nos lleva a aceptar/rechazar
+    ;CALL aceptar_rechazar
+    ;BTFSS PORTB, 0 ;nos regresa al modo normal
+    ;CALL normal
+    RETURN
+
+
+config_v1:
+    BCF PORTE, 0
+    BSF PORTE, 1
+    BCF PORTE, 2
+    ;BTFSS PORTB, 0
+    ;CALL config_v2 ;sino sigue con la rutina
+    MOVLW 10 ;mueve el valor decimal al tiempo1
+    MOVWF tiempo1 ;
+    BTFSS PORTB, 1 ;se revisa si se quiere incrementar el tiempo1
+    CALL incrementar1 ;
+    BTFSS PORTB, 2
+    CALL decrementar1 ;sino se va a decrementar el tiempo 1
+    RETURN ;regresa a revisar el boton otra vez
+
+config_v2:
+    BSF PORTE, 0
+    BSF PORTE, 1
+    BCF PORTE, 2
+    ;BTFSS PORTB, 0
+    ;CALL config_v3
     MOVLW 10
     MOVWF tiempo2
-    MOVF tiempo2, 0 ;mueve tiempo2 a W
     BTFSS PORTB, 1
     CALL incrementar2
     BTFSS PORTB, 2
     CALL decrementar2
     RETURN
 
-
-tiempov3:
+config_v3:
+    BCF PORTE, 0
+    BCF PORTE, 1
+    BSF PORTE, 2
+    ;BTFSS PORTB, 0
+    ;CALL aceptar_rechazar
     MOVLW 10
     MOVWF tiempo3
-    MOVF tiempo3, 0 ;mueve tiempo3 a W
     BTFSS PORTB, 1
     CALL incrementar3
     BTFSS PORTB, 2
@@ -2833,72 +2993,13 @@ tiempov3:
     RETURN
 
 
-incrementar1:
-    ADDLW 1 ;le suma 1 al tiempo1
-    MOVLW 20
-    SUBWF tiempo1
-    BTFSS STATUS, 2 ;mira si ya llego a 20
-    BTFSS PORTB, 1 ;si ya llego a 20 y se presiona una vez mas regresa a 10
-    MOVLW 10 ;mueve 10 a tiempo1 (valor decimal)
-    MOVWF tiempo1
-
-decrementar1:
-    SUBLW 1 ;le resta 1 al tiempo1
-    MOVLW 10
-    SUBWF tiempo1
-    BTFSS STATUS, 2 ;mira si ya llego a 10
-    BTFSS PORTB, 2 ;si ya llego a 10 y se presiona una vez mas regresa a 20
-    MOVLW 20 ;mueve el valor de 20 a tiempo1 (valor decimal)
-    MOVWF tiempo1
-
-incrementar2:
-    ADDLW 1 ;le suma 1 al tiempo1
-    MOVLW 20
-    SUBWF tiempo2
-    BTFSS STATUS, 2 ;mira si ya llego a 20
-    BTFSS PORTB, 1 ;si ya llego a 20 y se presiona una vez mas regresa a 10
-    MOVLW 10 ;mueve 10 a tiempo1 (valor decimal)
-    MOVWF tiempo2
-
-decrementar2:
-    SUBLW 1 ;le resta 1 al tiempo1
-    MOVLW 10
-    SUBWF tiempo2
-    BTFSS STATUS, 2 ;mira si ya llego a 10
-    BTFSS PORTB, 2 ;si ya llego a 10 y se presiona una vez mas regresa a 20
-    MOVLW 20 ;mueve el valor de 20 a tiempo1 (valor decimal)
-    MOVWF tiempo2
-
-incrementar3:
-    ADDLW 1 ;le suma 1 al tiempo1
-    MOVLW 20
-    SUBWF tiempo3
-    BTFSS STATUS, 2 ;mira si ya llego a 20
-    BTFSS PORTB, 1 ;si ya llego a 20 y se presiona una vez mas regresa a 10
-    MOVLW 10 ;mueve 10 a tiempo1 (valor decimal)
-    MOVWF tiempo3
-
-decrementar3:
-    SUBLW 1 ;le resta 1 al tiempo1
-    MOVLW 10
-    SUBWF tiempo3
-    BTFSS STATUS, 2 ;mira si ya llego a 10
-    BTFSS PORTB, 2 ;si ya llego a 10 y se presiona una vez mas regresa a 20
-    MOVLW 20 ;mueve el valor de 20 a tiempo1 (valor decimal)
-    MOVWF tiempo3
-
-
-aceptar: ;en esta rutina se llaman todos los valores para los 7seg
-         ;y para los leds de los traffic lights
-    ;tiempo1
-    MOVF tiempo1, 0
-    ;MOVWF
-;===============================================================================
-; SUBRUTINAS DE INTERRUPCION
-;===============================================================================
-
-int_t0:
-
+aceptar_rechazar:
+    BSF PORTE, 0
+    BCF PORTE, 1
+    BSF PORTE, 2
+    ;BTFSS PORTB, 0
+    ;CALL normal
+    RETURN
 
 
 multiplex:
@@ -2999,5 +3100,6 @@ next7:
 next8:
     CLRF transistores ;para que vaya al primer display
     RETURN
+
 
 END
