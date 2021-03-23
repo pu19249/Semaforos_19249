@@ -89,85 +89,25 @@ PUSH:
     
 ISR: ;revision de los botones del puerto B
     BTFSS   RBIF		    ;hubo botonazo en el puerto B
-    GOTO    POP			    ;por si no hubo interrupcion
-    
-    BTFSS   estado, 0
-    GOTO    modo_0_int
-
-    BTFSS   estado, 1
-    GOTO    modo_1_int
-    
-    BTFSS   estado, 2
-    GOTO    modo_2_int
-    
-    BTFSS   estado, 3
-    GOTO    modo_3_int
-    
-    BTFSS   estado, 4
-    GOTO    modo_4_int
-    
-modo_0_int:
-    BTFSS   PORTB, 1	    ;no hace nada en este caso, tampoco el boton 3
-    NOP
-    BTFSS   PORTB, 2
-    NOP
-    ;CALL    normal
-    BTFSS   PORTB, 0	    ;para ver si estando aqui cambio de modo
-    BSF	    estado, 0	    ;para que ya este como completado este modo
-    BCF	    RBIF	    ;limpiar la bandera de interrupcion
-    GOTO    POP
-    
-    
-modo_1_int:
-    CALL    config_v1
-    BTFSS   PORTB, 0	    ;para verificar el cambio de modo
-    BSF	    estado, 1	    ;para que cuando regrese pueda ir al otro modo
+    CALL    modos_prueba	    ;por si no hubo interrupcion
     BCF	    RBIF
-    GOTO    POP
+    BTFSC   T0IF	    ;revisa si hubo overflow en el timer0
+    CALL    int_t0	    ;subrutina timer0
     
-    
-modo_2_int:
-    CALL    config_v2
-    BTFSS   PORTB, 0
-    BSF	    estado, 2
-    BCF	    RBIF
-    GOTO    POP
-    
-modo_3_int:
-    CALL    config_v3
-    BTFSS   PORTB, 0
-    BSF	    estado, 3
-    BCF	    RBIF
-    GOTO    POP
-    
-modo_4_int:
-;    BTFSS   PORTB, 1
-;    ;aceptar cambios
-;    CALL    aceptar
-;    BTFSS   PORTB, 2
-;    ;rechazar cambios
-;    CALL    normal	;regresa al modo de funcionamiento normal
-;    BTFSS   PORTB, 0
-;    BSF	    estado, 4
-;    BCF	    RBIF
-    GOTO    POP
-    
-
-
-
 POP:
     SWAPF   STATUS_TEMP, W
     MOVWF   STATUS
     SWAPF   W_TEMP, F
     SWAPF   W_TEMP,W
     RETFIE	       ;stack is popped in the PC
-	
+    
 
     
 ;===============================================================================
 ;				TABLA
 ;===============================================================================
     
+//<editor-fold defaultstate="collapsed" desc="tabla">
     PSECT code, delta=2, abs
     ORG 100h
 
@@ -193,7 +133,8 @@ tabla_disp:		    ;tabla para el display de 7seg
     RETLW	01111001B   ;E
     RETLW	01110001B   ;F
     
-    
+    //</editor-fold>
+
 ;===============================================================================
 ;		       CONFIGURACION DE PUERTOS
 ;===============================================================================
@@ -281,6 +222,7 @@ main:
     CLRF	PORTC
     CLRF	PORTD
     CLRF	PORTE
+    CLRF	estado
     //</editor-fold>
 
 ;===============================================================================
@@ -288,22 +230,10 @@ main:
 ;===============================================================================
     
 loop:
-    ;CALL	normal		;comienza en el modo normal
-    CALL	multiplex	;para que esten multiplexeando siempre los disp
-    BTFSS	estado, 0
-    GOTO	modo_normal
-    
-    BTFSS	estado, 1
-    GOTO	via1
-    
-    BTFSS	estado, 2
-    GOTO	via2
-    
-    BTFSS	estado, 3
-    GOTO	via3
-    
-    BTFSS	estado, 4
-    GOTO	aceptar
+    CALL	normal		;comienza en el modo normal
+    ;CALL	multiplex	;para que esten multiplexeando siempre los disp
+    CALL	seleccion
+
     
     GOTO	loop
 ;===============================================================================
@@ -384,40 +314,12 @@ division_unidades_t3:
     GOTO	$-6		    ;se repite si cabe otra centena
     //</editor-fold>
 
-modo_normal:
-    BSF		PORTE, 0
-    BCF		PORTE, 1
-    BCF		PORTE, 2
-    GOTO	loop
-    
-via1:
-    BCF		PORTE, 0
-    BSF		PORTE, 1
-    BCF		PORTE, 2
-    GOTO	loop
-
-via2:
-    BSF		PORTE, 0
-    BSF		PORTE, 1
-    BCF		PORTE, 2
-    GOTO	loop
-    
-via3:
-    BCF		PORTE, 0
-    BCF		PORTE, 1
-    BSF		PORTE, 2
-    GOTO	loop
-    
-aceptar:
-    BSF		PORTE, 0
-    BCF		PORTE, 1
-    BSF		PORTE, 2
-    GOTO	loop
-;preparar_displays:
-;    
 normal:
+    BSF		PORTE, 0
+    BCF		PORTE, 1
+    BCF		PORTE, 2
     RETURN
-    
+
 
 //<editor-fold defaultstate="collapsed" desc="rutinas para inc y dec variables de tiempo">
 incrementar1:
@@ -523,70 +425,95 @@ decrementar3:
     RETURN
     //</editor-fold>
 
-
+seleccion:
+    MOVLW	2
+    SUBWF	estado, 0
+    BTFSS	STATUS, 2
+    CALL	config_v1
+    RETURN
     
 ;===============================================================================
 ;			    SUBRUTINAS DE INTERRUPCION				
 ;===============================================================================
+    
+reiniciar:
+   MOVLW	254     ;para los 10ms con el clock 250kHz
+   MOVWF	TMR0	;mover este valor inicial al timer0
+   BCF		T0IF	;
+   RETURN
 
+modos_prueba:
+    BTFSS   PORTB, 0
+    INCF    estado    
+;    MOVLW   6
+;    SUBWF   estado, 0
+;    BTFSS   STATUS, 2
+;    CLRF    estado
+    RETURN
+
+    
 config_v1:
-;    BCF		PORTE, 0
-;    BSF		PORTE, 1
-;    BCF		PORTE, 2
-    MOVLW	10		;mueve el valor decimal al tiempo1
-    MOVWF	tiempo1		;
-    BTFSS	PORTB, 1	;se revisa si se quiere incrementar el tiempo1
-    GOTO	incrementar1	;
-    BTFSS	PORTB, 2
-    GOTO	decrementar1	;sino se va a decrementar el tiempo 1
-    BTFSS	PORTB, 0
-    BSF		estado, 1
-    BCF		RBIF
-    GOTO	POP
+    BCF		PORTE, 0
+    BSF		PORTE, 1
+    BCF		PORTE, 2
+;    MOVLW	10		;mueve el valor decimal al tiempo1
+;    MOVWF	tiempo1		;
+;    BTFSS	PORTB, 1	;se revisa si se quiere incrementar el tiempo1
+;    GOTO	incrementar1	;
+;    BTFSS	PORTB, 2
+;    GOTO	decrementar1	;sino se va a decrementar el tiempo 1
+;    ;BTFSS	PORTB, 0
+;    ;BSF		estado, 1
+;    ;BCF		RBIF
+    RETURN
     			
     
 config_v2:
-;    BSF		PORTE, 0
-;    BSF		PORTE, 1
-;    BCF		PORTE, 2
-    MOVLW	10
-    MOVWF	tiempo2
-    BTFSS	PORTB, 1
-    GOTO  	incrementar2
-    BTFSS	PORTB, 2
-    GOTO   	decrementar2
-    BTFSS	PORTB, 0
-    BSF		estado, 2
-    BCF		RBIF
-    GOTO	POP
+    BSF		PORTE, 0
+    BSF		PORTE, 1
+    BCF		PORTE, 2
+;    MOVLW	10
+;    MOVWF	tiempo2
+;    BTFSS	PORTB, 1
+;    GOTO  	incrementar2
+;    BTFSS	PORTB, 2
+;    GOTO   	decrementar2
+;    ;BTFSS	PORTB, 0
+;    ;BSF		estado, 2
+;    ;BCF		RBIF
+    RETURN
     
 config_v3:
-;    BCF		PORTE, 0
-;    BCF		PORTE, 1
-;    BSF		PORTE, 2
-    MOVLW	10
-    MOVWF	tiempo3
-    BTFSS	PORTB, 1
-    GOTO	incrementar3
-    BTFSS	PORTB, 2
-    GOTO	decrementar3
-    BTFSS	PORTB, 0
-    BSF		estado, 3
-    BCF		RBIF
-    GOTO	POP
+    BCF		PORTE, 0
+    BCF		PORTE, 1
+    BSF		PORTE, 2
+;    MOVLW	10
+;    MOVWF	tiempo3
+;    BTFSS	PORTB, 1
+;    GOTO	incrementar3
+;    BTFSS	PORTB, 2
+;    GOTO	decrementar3
+    ;BTFSS	PORTB, 0
+    ;BSF		estado, 3
+    ;BCF		RBIF
+    RETURN
     
 
 aceptar_rechazar:
-;    BSF		PORTE, 0
-;    BCF		PORTE, 1
-;    BSF		PORTE, 2
+    BSF		PORTE, 0
+    BCF		PORTE, 1
+    BSF		PORTE, 2
 ;    BTFSS	PORTB, 0
 ;    CALL	normal
     GOTO	POP
     
+
+    
 //<editor-fold defaultstate="collapsed" desc="desplegar valores en display">
-multiplex:
-    ;reiniciar timers
+int_t0:
+    MOVLW	255     ;para los 10ms con el clock 250kHz
+    MOVWF	TMR0	;mover este valor inicial al timer0
+    BCF		T0IF	;
     CLRF	PORTD			    ;puerto con transistores
     
     BTFSC	transistores, 0
