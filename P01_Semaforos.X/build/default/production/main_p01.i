@@ -2485,7 +2485,7 @@ ENDM
 ;===============================================================================
 
 reiniciar MACRO
-    MOVLW 254 ;para los 10ms con el clock 250kHz
+    MOVLW 255 ;para los 10ms con el clock 250kHz
     MOVWF TMR0 ;mover este valor inicial al timer0
     BCF ((INTCON) and 07Fh), 2 ;
 ENDM
@@ -2519,11 +2519,23 @@ PSECT udata_bank0
  unidades_t3: DS 1
  decenas_t3: DS 1
  dividendo_t3: DS 1
+ verde_normal: DS 1
+ verde_titilante: DS 1
+ amarillo: DS 1
+ contador: DS 1
+ display_seven: DS 2
+ resta_t1: DS 1
+ tiempo_rojo_t1: DS 2
+ tiempo_rojo_t2: DS 2
+ tiempo_rojo_t3: DS 2
 
 PSECT udata_shr
  W_TEMP: DS 1
  STATUS_TEMP: DS 1
 
+
+  GLOBAL estado, transistores, display, tiempo1, tiempo2, tiempo3, decenas_t1
+   GLOBAL unidades_t1, decenas_t2, unidades_t2, decenas_t3, unidades_t3
 ;===============================================================================
 ; VECTOR DE INTERRUPCION
 ;===============================================================================
@@ -2537,11 +2549,14 @@ PUSH:
     MOVWF STATUS_TEMP
 
 ISR: ;revision de los botones del puerto B
-    BTFSS ((INTCON) and 07Fh), 0 ;hubo botonazo en el puerto B
-    CALL modos_prueba ;por si no hubo interrupcion
-    BCF ((INTCON) and 07Fh), 0
+   ; BTFSS ((INTCON) and 07Fh), 0 ;hubo botonazo en el puerto B
+   ; CALL modos ;por si no hubo interrupcion
+   ; BCF ((INTCON) and 07Fh), 0
     BTFSC ((INTCON) and 07Fh), 2 ;revisa si hubo overflow en el timer0
     CALL int_t0 ;subrutina timer0
+    BTFSC ((PIR1) and 07Fh), 0
+    CALL reiniciar_tmr1
+    BCF ((PIR1) and 07Fh), 0
 
 POP:
     SWAPF STATUS_TEMP, W
@@ -2673,18 +2688,30 @@ main:
     CLRF PORTE
     CLRF estado
 
+    ;mis tiempos van siempre desde 10 segundos como minimo
+    MOVLW 10
+    MOVWF tiempo1
+    MOVLW 10
+    MOVWF tiempo2
+    MOVLW 10
+    MOVWF tiempo3
+
+
 
 ;===============================================================================
 ; LOOP PRINCIPAL
 ;===============================================================================
 
 loop:
-    CALL normal ;comienza en el modo normal
-    ;CALL multiplex ;para que esten multiplexeando siempre los disp
-    CALL seleccion
+   CALL normal
+   CALL division_decenas_t1
+   CALL division_decenas_t2
+   CALL division_decenas_t3
+   CALL mostrar_display
 
 
-    GOTO loop
+
+   GOTO loop
 ;===============================================================================
 ; SUBRUTINAS
 ;===============================================================================
@@ -2763,206 +2790,94 @@ division_unidades_t3:
     GOTO $-6 ;se repite si cabe otra centena
 
 
+
+
+incrementar_tiempo:
+    MOVLW 3 ;quiero que el tmr1 se repita 3 veces segundos
+    SUBWF contador, 0 ;resto lo que tengo en el contador con w
+    BTFSS STATUS, 2 ;bandera zero del status
+    RETURN ;regreso cuando se levanta
+    DECF display_seven ;incremento mi variable que me traduce para mis 7seg
+    CLRF contador ;reinicio la variable del contador interno
+    RETURN
+
+reiniciar_tmr1:
+    BTFSC ((PIR1) and 07Fh), 0
+    BANKSEL TMR1L
+    MOVLW 0xE1
+    MOVWF TMR1L
+    MOVLW 0x7C
+    MOVWF TMR1H
+    INCF resta_t1
+    RETURN
+
 normal:
     BSF PORTE, 0
     BCF PORTE, 1
     BCF PORTE, 2
-    RETURN
 
+    BTFSC contador, 0
+    GOTO semaforo02
 
+    BTFSC contador, 1
+    GOTO semaforo03
 
-incrementar1:
-    INCF tiempo1 ;le suma 1 al tiempo1
-    MOVLW 20
-    SUBWF tiempo1
-    BTFSS STATUS, 2 ;mira si ya llego a 20
-    BTFSS PORTB, 1 ;si ya llego a 20 y se presiona una vez mas regresa a 10
-    MOVLW 10 ;mueve 10 a tiempo1 (valor decimal)
-    MOVWF tiempo1
-    CALL division_decenas_t1
-    MOVF decenas_t1
-    CALL tabla_disp
-    MOVWF display+0
-    MOVF unidades_t1
-    CALL tabla_disp
-    MOVWF display+1
-    RETURN
-
-decrementar1:
-    DECF tiempo1 ;le resta 1 al tiempo1
-    MOVLW 10
-    SUBWF tiempo1
-    BTFSS STATUS, 2 ;mira si ya llego a 10
-    BTFSS PORTB, 2 ;si ya llego a 10 y se presiona una vez mas regresa a 20
-    MOVLW 20 ;mueve el valor de 20 a tiempo1 (valor decimal)
-    MOVWF tiempo1
-    CALL division_decenas_t1
-    MOVF decenas_t1
-    CALL tabla_disp
-    MOVWF display+0
-    MOVF unidades_t1
-    CALL tabla_disp
-    MOVWF display+1
-    RETURN
-
-incrementar2:
-    INCF tiempo2 ;le suma 1 al tiempo1
-    MOVLW 20
-    SUBWF tiempo2
-    BTFSS STATUS, 2 ;mira si ya llego a 20
-    BTFSS PORTB, 1 ;si ya llego a 20 y se presiona una vez mas regresa a 10
-    MOVLW 10 ;mueve 10 a tiempo1 (valor decimal)
-    MOVWF tiempo2
-    CALL division_decenas_t2
-    MOVF decenas_t2
-    CALL tabla_disp
-    MOVWF display+0
-    MOVF unidades_t2
-    CALL tabla_disp
-    MOVWF display+1
-    RETURN
-
-decrementar2:
-    DECF tiempo2 ;le resta 1 al tiempo1
-    MOVLW 10
-    SUBWF tiempo2
-    BTFSS STATUS, 2 ;mira si ya llego a 10
-    BTFSS PORTB, 2 ;si ya llego a 10 y se presiona una vez mas regresa a 20
-    MOVLW 20 ;mueve el valor de 20 a tiempo1 (valor decimal)
-    MOVWF tiempo2
-    CALL division_decenas_t2
-    MOVF decenas_t2
-    CALL tabla_disp
-    MOVWF display+0
-    MOVF unidades_t2
-    CALL tabla_disp
-    MOVWF display+1
-    RETURN
-
-incrementar3:
-    INCF tiempo3 ;le suma 1 al tiempo1
-    MOVLW 20
-    SUBWF tiempo3
-    BTFSS STATUS, 2 ;mira si ya llego a 20
-    BTFSS PORTB, 1 ;si ya llego a 20 y se presiona una vez mas regresa a 10
-    MOVLW 10 ;mueve 10 a tiempo1 (valor decimal)
-    MOVWF tiempo3
-    CALL division_decenas_t3
-    MOVF decenas_t3
-    CALL tabla_disp
-    MOVWF display+0
-    MOVF unidades_t3
-    CALL tabla_disp
-    MOVWF display+1
-    RETURN
-
-decrementar3:
-    DECF tiempo3 ;le resta 1 al tiempo1
-    MOVLW 10
-    SUBWF tiempo3
-    BTFSS STATUS, 2 ;mira si ya llego a 10
-    BTFSS PORTB, 2 ;si ya llego a 10 y se presiona una vez mas regresa a 20
-    MOVLW 20 ;mueve el valor de 20 a tiempo1 (valor decimal)
-    MOVWF tiempo3
-    CALL division_decenas_t3
-    MOVF decenas_t3
-    CALL tabla_disp
-    MOVWF display+0
-    MOVF unidades_t3
-    CALL tabla_disp
-    MOVWF display+1
-    RETURN
-
-
-seleccion:
-    MOVLW 2
-    SUBWF estado, 0
+    semaforo01:
+    BCF STATUS, 2
+    MOVF resta_t1, 0
+    SUBWF tiempo1, 1
     BTFSS STATUS, 2
-    CALL config_v1
+    GOTO $+2
+    BSF contador, 0
+    RETURN
+
+    semaforo02:
+    BCF STATUS, 2
+    MOVF resta_t1, 0
+    SUBWF tiempo2, 1
+    BTFSS STATUS, 2
+    GOTO $+2
+    BSF contador, 1
+    RETURN
+
+    semaforo03:
+    BCF STATUS, 2
+    MOVF resta_t1, 0
+    SUBWF tiempo3, 1
+    BTFSS STATUS, 2
+    GOTO $+2
+    BSF contador, 1
+    RETURN
+
+
+mostrar_display:
+    MOVF decenas_t1, 0
+    CALL tabla_disp
+    MOVWF display+0
+    MOVF unidades_t1, 0
+    CALL tabla_disp
+    MOVWF display+1
+    MOVF decenas_t2, 0
+    CALL tabla_disp
+    MOVWF display+2
+    MOVF unidades_t2, 0
+    CALL tabla_disp
+    MOVWF display+3
+    MOVF decenas_t3, 0
+    CALL tabla_disp
+    MOVWF display+4
+    MOVF unidades_t3, 0
+    CALL tabla_disp
+    MOVWF display+5
     RETURN
 
 ;===============================================================================
 ; SUBRUTINAS DE INTERRUPCION
 ;===============================================================================
 
-reiniciar:
-   MOVLW 254 ;para los 10ms con el clock 250kHz
-   MOVWF TMR0 ;mover este valor inicial al timer0
-   BCF ((INTCON) and 07Fh), 2 ;
-   RETURN
-
-modos_prueba:
-    BTFSS PORTB, 0
-    INCF estado
-; MOVLW 6
-; SUBWF estado, 0
-; BTFSS STATUS, 2
-; CLRF estado
-    RETURN
-
-
-config_v1:
-    BCF PORTE, 0
-    BSF PORTE, 1
-    BCF PORTE, 2
-; MOVLW 10 ;mueve el valor decimal al tiempo1
-; MOVWF tiempo1 ;
-; BTFSS PORTB, 1 ;se revisa si se quiere incrementar el tiempo1
-; GOTO incrementar1 ;
-; BTFSS PORTB, 2
-; GOTO decrementar1 ;sino se va a decrementar el tiempo 1
-; ;BTFSS PORTB, 0
-; ;BSF estado, 1
-; ;BCF ((INTCON) and 07Fh), 0
-    RETURN
-
-
-config_v2:
-    BSF PORTE, 0
-    BSF PORTE, 1
-    BCF PORTE, 2
-; MOVLW 10
-; MOVWF tiempo2
-; BTFSS PORTB, 1
-; GOTO incrementar2
-; BTFSS PORTB, 2
-; GOTO decrementar2
-; ;BTFSS PORTB, 0
-; ;BSF estado, 2
-; ;BCF ((INTCON) and 07Fh), 0
-    RETURN
-
-config_v3:
-    BCF PORTE, 0
-    BCF PORTE, 1
-    BSF PORTE, 2
-; MOVLW 10
-; MOVWF tiempo3
-; BTFSS PORTB, 1
-; GOTO incrementar3
-; BTFSS PORTB, 2
-; GOTO decrementar3
-    ;BTFSS PORTB, 0
-    ;BSF estado, 3
-    ;BCF ((INTCON) and 07Fh), 0
-    RETURN
-
-
-aceptar_rechazar:
-    BSF PORTE, 0
-    BCF PORTE, 1
-    BSF PORTE, 2
-; BTFSS PORTB, 0
-; CALL normal
-    GOTO POP
-
-
-
 
 int_t0:
-     MOVLW 255 ;para los 10ms con el clock 250kHz
-   MOVWF TMR0 ;mover este valor inicial al timer0
-   BCF ((INTCON) and 07Fh), 2 ;
+    reiniciar
     CLRF PORTD ;puerto con transistores
 
     BTFSC transistores, 0
@@ -2987,42 +2902,42 @@ int_t0:
     GOTO display8
 
 display1: ;parte decenas via1
-    MOVF display+0
+    MOVF display+0,0
     MOVWF PORTC
     BSF PORTD, 0
     GOTO next1
 display2: ;parte unidades via1
-    MOVF display+1
+    MOVF display+1, 0
     MOVWF PORTC
     BSF PORTD, 1
     GOTO next2
 display3:
-    MOVF display+2
+    MOVF display+2, 0
     MOVWF PORTC
     BSF PORTD, 2
     GOTO next3
 display4:
-    MOVF display+3
+    MOVF display+3, 0
     MOVWF PORTC
     BSF PORTD, 3
     GOTO next4
 display5:
-    MOVF display+4
+    MOVF display+4, 0
     MOVWF PORTC
     BSF PORTD, 4
     GOTO next5
 display6:
-    MOVF display+5
+    MOVF display+5, 0
     MOVWF PORTC
     BSF PORTD, 5
     GOTO next6
 display7:
-    MOVF display+6
+    MOVF display+6, 0
     MOVWF PORTC
     BSF PORTD, 6
     GOTO next7
 display8:
-    MOVF display+7
+    MOVF display+7, 0
     MOVWF PORTC
     BSF PORTD, 7
     GOTO next8
