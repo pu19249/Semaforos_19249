@@ -240,12 +240,12 @@ main:
     CLRF	estado
     
     ;mis tiempos van siempre desde 10 segundos como minimo
-    MOVLW	10
-    MOVWF	tiempo1
-    MOVLW	10
-    MOVWF	tiempo2
-    MOVLW	10
-    MOVWF	tiempo3
+;    MOVLW	10
+;    MOVWF	tiempo1
+;    MOVLW	10
+;    MOVWF	tiempo2
+;    MOVLW	10
+;    MOVWF	tiempo3
     
     //</editor-fold>
 
@@ -375,29 +375,38 @@ normal:
         
     semaforo01:
     BCF		STATUS, 2
+    MOVLW	5
+    MOVWF	tiempo1
     MOVF	resta_t1, 0
     SUBWF	tiempo1, 1
     BTFSS	STATUS, 2
     GOTO	$+2
-    BSF		contador, 0
+    BSF		contador, 0  
     RETURN
     
     semaforo02:
     BCF		STATUS, 2
+    MOVLW	10
+    MOVWF	tiempo2
     MOVF	resta_t1, 0
     SUBWF	tiempo2, 1
     BTFSS	STATUS, 2
-    GOTO	$+2
+    GOTO	$+3
+    BCF		contador, 0
     BSF		contador, 1
     RETURN
     
     semaforo03:
     BCF		STATUS, 2
+    MOVLW	10
+    MOVWF	tiempo3
     MOVF	resta_t1, 0
     SUBWF	tiempo3, 1
     BTFSS	STATUS, 2
-    GOTO	$+2
-    BSF		contador, 1
+    GOTO	$+4
+    BCF		contador, 0
+    BCF		contador, 1
+    BSF		contador, 2
     RETURN
     
     
