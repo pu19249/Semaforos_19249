@@ -2528,6 +2528,10 @@ PSECT udata_bank0
  tiempo_rojo_t1: DS 2
  tiempo_rojo_t2: DS 2
  tiempo_rojo_t3: DS 2
+ cambio_modos: DS 1
+ normal_1: DS 1
+ normal_2: DS 1
+ normal_3: DS 1
 
 PSECT udata_shr
  W_TEMP: DS 1
@@ -2549,9 +2553,9 @@ PUSH:
     MOVWF STATUS_TEMP
 
 ISR: ;revision de los botones del puerto B
-   ; BTFSS ((INTCON) and 07Fh), 0 ;hubo botonazo en el puerto B
-   ; CALL modos ;por si no hubo interrupcion
-   ; BCF ((INTCON) and 07Fh), 0
+    BTFSC ((INTCON) and 07Fh), 0 ;hubo botonazo en el puerto B
+    CALL modos ;por si no hubo interrupcion
+    BCF ((INTCON) and 07Fh), 0
     BTFSC ((INTCON) and 07Fh), 2 ;revisa si hubo overflow en el timer0
     CALL int_t0 ;subrutina timer0
     BTFSC ((PIR1) and 07Fh), 0
@@ -2687,7 +2691,12 @@ main:
     CLRF PORTD
     CLRF PORTE
     CLRF estado
-
+    MOVLW 10
+    MOVWF normal_1
+    MOVLW 20
+    MOVWF normal_2
+    MOVLW 30
+    MOVWF normal_3
     ;mis tiempos van siempre desde 10 segundos como minimo
 ; MOVLW 10
 ; MOVWF tiempo1
@@ -2703,11 +2712,35 @@ main:
 ;===============================================================================
 
 loop:
+
+
    CALL normal
-   CALL division_decenas_t1
-   CALL division_decenas_t2
-   CALL division_decenas_t3
-   CALL mostrar_display
+   ;revisar a que modo me voy
+   MOVLW 1
+   SUBWF cambio_modos, 0 ;para que no se altere el valor en la variable
+   BTFSC STATUS, 2
+   CALL config_v1
+   MOVLW 2
+   SUBWF cambio_modos, 0 ;para que no se altere el valor en la variable
+   BTFSC STATUS, 2
+   CALL config_v2
+   MOVLW 3
+   SUBWF cambio_modos, 0 ;para que no se altere el valor en la variable
+   BTFSC STATUS, 2
+   CALL config_v3
+   MOVLW 4
+   SUBWF cambio_modos, 0 ;para que no se altere el valor en la variable
+   BTFSC STATUS, 2
+   CALL aceptar_rechazar
+   MOVLW 5
+   SUBWF cambio_modos, 0
+   BTFSC STATUS, 2
+   CLRF cambio_modos
+
+   ;CALL division_decenas_t1
+   ;CALL division_decenas_t2
+   ;CALL division_decenas_t3
+   ;CALL mostrar_display
 
 
 
@@ -2792,6 +2825,11 @@ division_unidades_t3:
 
 
 
+modos:
+    BTFSC PORTB, 0
+    INCF cambio_modos ;con esto reviso mi cambio de modos con restas
+    RETURN
+
 incrementar_tiempo:
     MOVLW 3 ;quiero que el tmr1 se repita 3 veces segundos
     SUBWF contador, 0 ;resto lo que tengo en el contador con w
@@ -2804,17 +2842,15 @@ incrementar_tiempo:
 reiniciar_tmr1:
     BTFSC ((PIR1) and 07Fh), 0
     BANKSEL TMR1L
-    MOVLW 0xE1
-    MOVWF TMR1L
     MOVLW 0x7C
+    MOVWF TMR1L
+    MOVLW 0xE1
     MOVWF TMR1H
     INCF resta_t1
     RETURN
 
 normal:
     BSF PORTE, 0
-    BCF PORTE, 1
-    BCF PORTE, 2
 
     BTFSC contador, 0
     GOTO semaforo02
@@ -2822,9 +2858,12 @@ normal:
     BTFSC contador, 1
     GOTO semaforo03
 
+    BTFSC contador, 2
+    GOTO clear
+
     semaforo01:
     BCF STATUS, 2
-    MOVLW 5
+    MOVF normal_1, 0
     MOVWF tiempo1
     MOVF resta_t1, 0
     SUBWF tiempo1, 1
@@ -2835,7 +2874,7 @@ normal:
 
     semaforo02:
     BCF STATUS, 2
-    MOVLW 10
+    MOVF normal_2, 0
     MOVWF tiempo2
     MOVF resta_t1, 0
     SUBWF tiempo2, 1
@@ -2847,7 +2886,7 @@ normal:
 
     semaforo03:
     BCF STATUS, 2
-    MOVLW 10
+    MOVF normal_2, 0
     MOVWF tiempo3
     MOVF resta_t1, 0
     SUBWF tiempo3, 1
@@ -2856,6 +2895,12 @@ normal:
     BCF contador, 0
     BCF contador, 1
     BSF contador, 2
+    RETURN
+
+    clear:
+    CLRF contador
+    CLRF resta_t1
+    BCF ((PIR1) and 07Fh), 0
     RETURN
 
 
@@ -2880,6 +2925,109 @@ mostrar_display:
     MOVWF display+5
     RETURN
 
+
+config_v1:
+    BCF PORTE, 0
+    BSF PORTE, 1
+    BCF PORTE, 2
+    MOVLW 10 ;mueve el valor decimal al tiempo1
+    MOVWF tiempo1 ;
+    BTFSS PORTB, 1 ;se revisa si se quiere incrementar el tiempo1
+    GOTO incrementar1 ;
+    BTFSS PORTB, 2
+    GOTO decrementar1 ;sino se va a decrementar el tiempo 1
+    RETURN
+
+ config_v2:
+    BSF PORTE, 0
+    BSF PORTE, 1
+    BCF PORTE, 2
+    MOVLW 10
+    MOVWF tiempo2
+    BTFSS PORTB, 1
+    GOTO incrementar2
+    BTFSS PORTB, 2
+    GOTO decrementar2
+    RETURN
+
+config_v3:
+    BCF PORTE, 0
+    BCF PORTE, 1
+    BSF PORTE, 2
+    MOVLW 10
+    MOVWF tiempo3
+    BTFSS PORTB, 1
+    GOTO incrementar3
+    BTFSS PORTB, 2
+    GOTO decrementar3
+    RETURN
+
+aceptar_rechazar:
+    BSF PORTE, 0
+    BCF PORTE, 1
+    BSF PORTE, 2
+    RETURN
+
+
+incrementar1:
+    INCF tiempo1 ;le suma 1 al tiempo1
+    MOVLW 21
+    SUBWF tiempo1, 0
+    BTFSS STATUS, 2 ;mira si ya llego a 20
+    GOTO $+3
+    MOVLW 10 ;mueve 10 a tiempo1 (valor decimal)
+    MOVWF tiempo1
+    RETURN
+
+decrementar1:
+    DECF tiempo1
+    MOVLW 9
+    SUBWF tiempo1, 0
+    BTFSS STATUS, 2
+    GOTO $+3
+    MOVLW 10
+    MOVWF tiempo1
+    RETURN
+
+incrementar2:
+    INCF tiempo2 ;le suma 1 al tiempo1
+    MOVLW 21
+    SUBWF tiempo2, 0
+    BTFSS STATUS, 2 ;mira si ya llego a 20
+    GOTO $+3
+    MOVLW 10 ;mueve 10 a tiempo1 (valor decimal)
+    MOVWF tiempo2
+    RETURN
+
+decrementar2:
+    DECF tiempo2
+    MOVLW 9
+    SUBWF tiempo2, 0
+    BTFSS STATUS, 2
+    GOTO $+3
+    MOVLW 10
+    MOVWF tiempo2
+    RETURN
+
+incrementar3:
+    INCF tiempo3 ;le suma 1 al tiempo1
+    MOVLW 21
+    SUBWF tiempo3, 0
+    BTFSS STATUS, 2 ;mira si ya llego a 20
+    GOTO $+3
+    MOVLW 10 ;mueve 10 a tiempo1 (valor decimal)
+    MOVWF tiempo3
+    RETURN
+
+decrementar3:
+    DECF tiempo3
+    MOVLW 9
+    SUBWF tiempo3, 0
+    BTFSS STATUS, 2
+    GOTO $+3
+    MOVLW 10
+    MOVWF tiempo3
+    RETURN
 ;===============================================================================
 ; SUBRUTINAS DE INTERRUPCION
 ;===============================================================================
