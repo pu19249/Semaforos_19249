@@ -61,6 +61,7 @@ PSECT udata_bank0
 	tiempo1:	    DS 1
 	tiempo2:	    DS 1
 	tiempo3:	    DS 1
+	temporal:	    DS 1
 	decenas_t1:	    DS 1
 	unidades_t1:	    DS 1
 	dividendo_t1:	    DS 1
@@ -70,6 +71,9 @@ PSECT udata_bank0
 	unidades_t3:	    DS 1
 	decenas_t3:	    DS 1
 	dividendo_t3:	    DS 1
+	decenas_temp:	    DS 1
+	unidades_temp:	    DS 1
+	dividendo_temp:	    DS 1
 	verde_normal:	    DS 1
 	verde_titilante:    DS 1
 	amarillo:	    DS 1
@@ -83,6 +87,27 @@ PSECT udata_bank0
 	normal_1:	    DS 1
 	normal_2:	    DS 1
 	normal_3:	    DS 1
+	tiempo_general:	    DS 1
+	decenas_tiempo_general:	DS 1
+	unidades_tiempo_general:    DS 1
+	tiempo_1_temporal:	    DS 1
+	tiempo_2_temporal:	    DS 1
+	tiempo_3_temporal:	    DS 1
+	
+	cambio_colores:	    DS 1
+	verde_t1:	    DS 1
+	verde_titilante_t1: DS 1
+	amarillo_t1:	    DS 1
+	rojo_t1:	    DS 1
+	verde_t2:	    DS 1
+	verde_titilante_t2: DS 1
+	amarillo_t2:	    DS 1
+	rojo_t2:	    DS 1
+	verde_t3:	    DS 1
+	verde_titilante_t3: DS 1
+	amarillo_t3:	    DS 1
+	rojo_t3:	    DS 1
+	
 
 PSECT udata_shr
 	W_TEMP:		    DS 1
@@ -133,7 +158,6 @@ POP:
 tabla_disp:		    ;tabla para el display de 7seg
     CLRF	PCLATH
     BSF		PCLATH, 0   ;PCLATH = 01 PCL =02
-    ANDLW	0x0f
     ADDWF	PCL	    ;PCL=PCLATH +PCL+W
     RETLW	00111111B   ;0
     RETLW	00000110B   ;1
@@ -248,6 +272,9 @@ main:
     MOVWF	normal_2
     MOVLW	30
     MOVWF	normal_3
+    
+    MOVLW	10		;mueve el valor decimal al tiempo1
+    MOVWF	tiempo_general	;
     ;mis tiempos van siempre desde 10 segundos como minimo
 ;    MOVLW	10
 ;    MOVWF	tiempo1
@@ -266,6 +293,7 @@ loop:
     
     
    CALL	    normal
+   CALL	    colores
    ;revisar a que modo me voy
    MOVLW    1
    SUBWF    cambio_modos, 0	    ;para que no se altere el valor en la variable
@@ -288,10 +316,11 @@ loop:
    BTFSC    STATUS, 2
    CLRF	    cambio_modos
    
-   ;CALL	    division_decenas_t1
-   ;CALL	    division_decenas_t2
-   ;CALL	    division_decenas_t3
-   ;CALL	    mostrar_display
+   CALL	    division_decenas_t1
+   CALL	    division_decenas_t2
+   CALL	    division_decenas_t3
+   CALL	    division_decenas_temp
+   CALL	    mostrar_display
 
 
    
@@ -373,22 +402,58 @@ division_unidades_t3:
     RETURN
     GOTO	$-6		    ;se repite si cabe otra centena
     
-
+division_decenas_temp:
+    MOVF	tiempo_general, 0
+    MOVWF	dividendo_temp	    ;para que me divida en centenas mi tiempo1		    
+    CLRF	decenas_tiempo_general	            ;para asgurar que se inicia en cero el proceso
+    MOVLW	10		    ;le resto una vez 100
+    SUBWF	dividendo_temp, 0	    ;lo guardo en W
+    BTFSC	STATUS, 0	    ;Skip if clear, porque cuando haya un resultado valido se activara
+    INCF	decenas_tiempo_general		    ;cuantas centenas caben en el numero
+    BTFSC	STATUS, 0	    ;
+    MOVWF	dividendo_temp	    ;el resultado de la resta estaba en W ahora en dividendo
+    BTFSC	STATUS, 0	    ;un tercer BTFSC para ver hasta cuando repito la operacion o si sigue a decenas
+    GOTO	$-7		    ;se repite si cabe otra centena
+    CALL	division_unidades_temp
+    RETURN
+division_unidades_temp:
+    CLRF	unidades_tiempo_general	    ;para asgurar que se inicia en cero el proceso
+    MOVLW	1		    ;le resto una vez 100
+    SUBWF	dividendo_temp, F	    ;lo guardo en W
+    BTFSC	STATUS, 0	    ;Skip if clear, porque cuando haya un resultado valido se activara
+    INCF	unidades_tiempo_general	    ;cuantas centenas caben en el numero
+    BTFSS	STATUS, 0	    ;es cuando ya se completo el numero     
+    RETURN
+    GOTO	$-6		    ;se repite si cabe otra centena
+    
     //</editor-fold>
 
 modos:
-    BTFSC   PORTB, 0
+    BTFSS   PORTB, 0
     INCF    cambio_modos	;con esto reviso mi cambio de modos con restas
-    RETURN
     
-incrementar_tiempo:
-    MOVLW	3		;quiero que el tmr1 se repita 3 veces segundos
-    SUBWF   contador, 0		;resto lo que tengo en el contador con w
-    BTFSS   STATUS, 2		;bandera zero del status
-    RETURN			;regreso cuando se levanta
-    DECF    display_seven	;incremento mi variable que me traduce para mis 7seg
-    CLRF    contador		;reinicio la variable del contador interno
-    RETURN
+    
+    ;revisar si quiero incrementar mi tiempo
+    BTFSS   PORTB, 1
+    INCF    tiempo_general	;le suma 1 al tiempo1
+    MOVLW   21
+    SUBWF   tiempo_general, 0
+    BTFSS   STATUS, 2	;mira si ya llego a 20
+    GOTO    $+3
+    MOVLW   10		;mueve 10 a tiempo1 (valor decimal)
+    MOVWF   tiempo_general
+    
+    ;revisar si quiero decrementar mi tiempo
+    BTFSS   PORTB, 2
+    DECF    tiempo_general
+    MOVLW   9
+    SUBWF   tiempo_general, 0
+    BTFSS   STATUS, 2
+    GOTO    $+3
+    MOVLW   10
+    MOVWF   tiempo_general
+    RETURN    
+    
     
 reiniciar_tmr1:
     BTFSC	TMR1IF
@@ -437,7 +502,7 @@ normal:
     
     semaforo03:
     BCF		STATUS, 2
-    MOVF	normal_2, 0
+    MOVF	normal_3, 0
     MOVWF	tiempo3
     MOVF	resta_t1, 0
     SUBWF	tiempo3, 1
@@ -452,6 +517,83 @@ normal:
     CLRF	contador
     CLRF	resta_t1
     BCF		TMR1IF
+    RETURN
+    
+colores:
+    ;CALL	reiniciar_tmr1
+    BTFSC	cambio_colores, 0
+    GOTO	sem02
+    
+    BTFSC	cambio_colores, 1
+    GOTO	sem03
+    
+    BTFSC	cambio_colores, 2
+    GOTO	sem04
+    
+    BTFSC	cambio_colores, 3
+    GOTO	sem05
+    
+    
+    sem01:
+	;esto es para que el verde este solido
+	BCF	    STATUS, 2
+	BSF	    PORTA, 2
+	BSF	    PORTA, 3
+	BSF	    PORTB, 5
+	;primero para que se mantenga en el verde solido
+	MOVF	    tiempo1, 0
+	MOVWF	    verde_t1
+	MOVLW	    6
+	SUBWF	    verde_t1, 1	;ahora en el tiempo verde_t1 hay tiempo1-6 segundos
+	;ahora si quiero que empiece a decrementar
+	MOVF	    resta_t1, 0	;lo que esta incrementando en el tmr1
+	SUBWF	    verde_t1, 1
+	BTFSS	    STATUS, 2
+	GOTO	    $+2
+	BSF	    cambio_colores, 0
+	RETURN
+	
+    sem02:
+	;ahora para el verde titilante (3 segundos por default)
+	BCF	    STATUS, 2
+	MOVLW	    3
+	SUBWF	    resta_t1, 0
+	BTFSS	    STATUS, 2
+	GOTO	    $+4
+	BSF	    cambio_colores, 1
+	;ahora apago el verde y enciendo el amarillo
+	BCF	    PORTA, 2
+	BSF	    PORTA, 1	    ;amarillo
+	RETURN
+    sem03:
+	;ahora para la parte del amarillo
+	BCF	    STATUS, 2
+	MOVLW	    3
+	SUBWF	    resta_t1,0
+	BTFSS	    STATUS, 2
+	GOTO	    $+4
+	BSF	    cambio_colores, 2
+	BCF	    PORTA, 1
+	BSF	    PORTA, 0	    ;se enciende el rojo
+	RETURN
+    sem04:
+	BCF	    STATUS, 2
+	MOVF	    tiempo1, 0
+	ADDWF	    tiempo3, 0
+	MOVWF	    rojo_t1
+	SUBWF	    resta_t1, 0
+	BTFSS	    STATUS, 2
+	GOTO	    $+4
+	BSF	    cambio_colores, 3
+	BCF	    PORTA, 0
+	BSF	    PORTA, 3
+	RETURN
+    sem05:
+	
+	RETURN
+    sem06:
+	
+	RETURN
     RETURN
     
     
@@ -474,6 +616,12 @@ mostrar_display:
     MOVF	unidades_t3, 0
     CALL	tabla_disp
     MOVWF	display+5
+    MOVF	decenas_tiempo_general, 0
+    CALL	tabla_disp
+    MOVWF	display+6
+    MOVF	unidades_tiempo_general, 0
+    CALL	tabla_disp
+    MOVWF	display+7
     RETURN
 	
     
@@ -481,104 +629,68 @@ config_v1:
     BCF		PORTE, 0
     BSF		PORTE, 1
     BCF		PORTE, 2
-    MOVLW	10		;mueve el valor decimal al tiempo1
-    MOVWF	tiempo1		;
-    BTFSS	PORTB, 1	;se revisa si se quiere incrementar el tiempo1
-    GOTO	incrementar1	;
-    BTFSS	PORTB, 2
-    GOTO	decrementar1	;sino se va a decrementar el tiempo 1
+    MOVF	tiempo_general, 0
+    MOVWF	tiempo_1_temporal
+    
     RETURN
     
  config_v2:
     BSF		PORTE, 0
     BSF		PORTE, 1
     BCF		PORTE, 2
-    MOVLW	10
-    MOVWF	tiempo2
-    BTFSS	PORTB, 1
-    GOTO	incrementar2
-    BTFSS	PORTB, 2
-    GOTO	decrementar2
+    MOVF	tiempo_general, 0
+    MOVWF	tiempo_2_temporal
     RETURN
     
 config_v3:
     BCF		PORTE, 0
     BCF		PORTE, 1
     BSF		PORTE, 2
-    MOVLW	10
-    MOVWF	tiempo3
-    BTFSS	PORTB, 1
-    GOTO	incrementar3
-    BTFSS	PORTB, 2
-    GOTO	decrementar3
+    MOVF	tiempo_general, 0
+    MOVWF	tiempo_3_temporal
+    
     RETURN
     
 aceptar_rechazar:
     BSF		PORTE, 0
     BCF		PORTE, 1
     BSF		PORTE, 2
+    ;enviar los tiempos temporales a las variables del modo normal
+    BTFSS	PORTB, 1
+    CALL	aceptar
+    BTFSS	PORTB, 2
+    CALL	rechazar
     RETURN
-    
-    
-incrementar1:
-    INCF    tiempo1	;le suma 1 al tiempo1
-    MOVLW   21
-    SUBWF   tiempo1, 0
-    BTFSS   STATUS, 2	;mira si ya llego a 20
-    GOTO    $+3
-    MOVLW   10		;mueve 10 a tiempo1 (valor decimal)
-    MOVWF   tiempo1
-    RETURN    
-    
-decrementar1:
-    DECF    tiempo1
-    MOVLW   9
-    SUBWF   tiempo1, 0
-    BTFSS   STATUS, 2
-    GOTO    $+3
-    MOVLW   10
-    MOVWF   tiempo1
-    RETURN
-    
-incrementar2:
-    INCF    tiempo2	;le suma 1 al tiempo1
-    MOVLW   21
-    SUBWF   tiempo2, 0
-    BTFSS   STATUS, 2	;mira si ya llego a 20
-    GOTO    $+3
-    MOVLW   10		;mueve 10 a tiempo1 (valor decimal)
-    MOVWF   tiempo2
-    RETURN    
-    
-decrementar2:
-    DECF    tiempo2
-    MOVLW   9
-    SUBWF   tiempo2, 0
-    BTFSS   STATUS, 2
-    GOTO    $+3
-    MOVLW   10
-    MOVWF   tiempo2
-    RETURN    
-    
-incrementar3:
-    INCF    tiempo3	;le suma 1 al tiempo1
-    MOVLW   21
-    SUBWF   tiempo3, 0
-    BTFSS   STATUS, 2	;mira si ya llego a 20
-    GOTO    $+3
-    MOVLW   10		;mueve 10 a tiempo1 (valor decimal)
-    MOVWF   tiempo3
-    RETURN    
-    
-decrementar3:
-    DECF    tiempo3
-    MOVLW   9
-    SUBWF   tiempo3, 0
-    BTFSS   STATUS, 2
-    GOTO    $+3
-    MOVLW   10
-    MOVWF   tiempo3
-    RETURN    
+    aceptar:
+	;colocar todo en rojo
+;	BSF	PORTA, 0
+;	BCF	PORTA, 1
+;	BCF	PORTA, 2
+;	
+;	BSF	PORTA, 3
+;	BCF	PORTA, 4
+;	BCF	PORTA, 4
+;	
+;	BSF	PORTB, 5
+;	BCF	PORTB, 6
+;	BCF	PORTB, 7
+	;momentaneamente los displays mostraran 0
+	MOVLW	0
+	MOVWF	tiempo1
+	MOVWF	tiempo2
+	MOVWF	tiempo3
+	
+	MOVF	tiempo_1_temporal, 0
+	MOVWF	tiempo1
+	MOVF	tiempo_2_temporal, 0
+	MOVWF	tiempo2
+	MOVF	tiempo_3_temporal, 0
+	MOVWF	tiempo3
+	RETURN
+    rechazar:
+	GOTO	loop
+	RETURN
+
 ;===============================================================================
 ;			    SUBRUTINAS DE INTERRUPCION				
 ;===============================================================================
