@@ -2555,6 +2555,7 @@ PSECT udata_bank0
     tiempo_3_temporal: DS 1
 
     cambio_colores: DS 1
+    cambio_colores_2: DS 1
     verde_t1: DS 1
     verde_titilante_t1: DS 1
     amarillo_t1: DS 1
@@ -2743,15 +2744,7 @@ main:
     MOVWF tiempo_general ;
 
     BSF funcionar, 0
-
-    ;mis tiempos van siempre desde 10 segundos como minimo
-; MOVLW 10
-; MOVWF tiempo1
-; MOVLW 10
-; MOVWF tiempo2
-; MOVLW 10
-; MOVWF tiempo3
-
+    CLRF cambio_colores
 
 
 ;===============================================================================
@@ -2996,13 +2989,21 @@ colores:
     BTFSC cambio_colores, 7
     GOTO sem09
 
+    BTFSC cambio_colores_2, 0
+    GOTO sem10
 
-sem01:
+sem01_inicial:
     ;esto es para que el verde este solido
     BCF STATUS, 2
     BSF PORTA, 2 ;verde s1
     BSF PORTA, 3 ;rojo s2
     BSF PORTB, 5 ;rojo s3
+    BCF PORTA, 0
+    BCF PORTA, 1
+    BCF PORTA, 4
+    BCF PORTA, 5
+    BCF PORTB, 6
+    BCF PORTB, 7
     ;primero para que se mantenga en el verde solido
     MOVF tiempo1, 0
     MOVWF verde_t1, 0
@@ -3045,8 +3046,7 @@ sem03:
     MOVF resta_t1, 0
     SUBWF amarillo_t1, 1
     BTFSS STATUS, 2
-    GOTO $+10
-    BCF cambio_colores, 0
+    GOTO $+9
     BCF cambio_colores, 1
     BSF cambio_colores, 2
     BCF PORTA, 1 ;se apaga el amarillo s1
@@ -3069,9 +3069,7 @@ sem04:
     MOVF resta_t1, 0
     SUBWF verde_t1, 1
     BTFSS STATUS, 2
-    GOTO $+5
-    BCF cambio_colores, 0
-    BCF cambio_colores, 1
+    GOTO $+3
     BCF cambio_colores, 2
     BSF cambio_colores, 3
     RETURN
@@ -3088,12 +3086,9 @@ sem05:
     delay
     BSF PORTA, 5
     BTFSS STATUS, 2
-    GOTO $+8
+    GOTO $+5
     BCF PORTA, 5 ;apago verde s2
     BSF PORTA, 4 ;amarillo s2
-    BCF cambio_colores, 0
-    BCF cambio_colores, 1
-    BCF cambio_colores, 2
     BCF cambio_colores, 3
     BSF cambio_colores, 4
     RETURN
@@ -3107,15 +3102,11 @@ sem06:
     MOVF resta_t1, 0
     SUBWF amarillo_t1, 1
     BTFSS STATUS, 2
-    GOTO $+13
+    GOTO $+9
     BCF PORTA, 4 ;apago amarillo s2
     BSF PORTA, 3 ;enciendo rojo s2
     BSF PORTB, 7 ;enciendo verde s3
     BCF PORTB, 5 ;apago rojo s3
-    BCF cambio_colores, 0
-    BCF cambio_colores, 1
-    BCF cambio_colores, 2
-    BCF cambio_colores, 3
     BCF cambio_colores, 4
     BSF cambio_colores, 5
     MOVLW 0
@@ -3135,12 +3126,7 @@ sem07: ;verde solido s3
     MOVF resta_t1, 0
     SUBWF verde_t1, 1
     BTFSS STATUS, 2
-    GOTO $+8
-    BCF cambio_colores, 0
-    BCF cambio_colores, 1
-    BCF cambio_colores, 2
-    BCF cambio_colores, 3
-    BCF cambio_colores, 4
+    GOTO $+3
     BCF cambio_colores, 5
     BSF cambio_colores, 6
     RETURN
@@ -3157,15 +3143,9 @@ sem08: ;verde titilante s3
     delay
     BSF PORTB, 7
     BTFSS STATUS, 2
-    GOTO $+11
+    GOTO $+5
     BCF PORTB, 7 ;apago verde s2
     BSF PORTB, 6 ;enciende amarillo s2
-    BCF cambio_colores, 0
-    BCF cambio_colores, 1
-    BCF cambio_colores, 2
-    BCF cambio_colores, 3
-    BCF cambio_colores, 4
-    BCF cambio_colores, 5
     BCF cambio_colores, 6
     BSF cambio_colores, 7
     RETURN
@@ -3178,14 +3158,21 @@ sem09: ;amarillo s3 y regreso a s1
     MOVF resta_t1, 0
     SUBWF amarillo_t1, 1
     BTFSS STATUS, 2
-    GOTO $+7
+    GOTO $+8
     BSF PORTB, 5 ;enciendo rojo s3
     BCF PORTB, 6 ;apago amarillo s3
     BCF PORTA, 0 ;apago rojo s1
-    CLRF cambio_colores
+    BCF cambio_colores, 7
+    BSF cambio_colores_2, 0
     MOVLW 0
     MOVWF resta_t1
     RETURN
+
+sem10:
+    CLRF cambio_colores
+    BCF cambio_colores_2, 0
+    RETURN
+
 
 
 mostrar_display:
@@ -3259,18 +3246,6 @@ aceptar:
     BSF PORTE, 1
     BSF PORTE, 2
  ;colocar todo en rojo
-    BSF PORTA, 0
-    BCF PORTA, 1
-    BCF PORTA, 2
-
-    BSF PORTA, 3
-    BCF PORTA, 4
-    BCF PORTA, 4
-
-    BSF PORTB, 5
-    BCF PORTB, 6
-    BCF PORTB, 7
-
     MOVF tiempo_1_temporal, 0
     MOVWF tiempo1
     MOVWF normal_1
