@@ -815,7 +815,7 @@ aceptar:
     ;ADDWF	tiempo3			    ;sumado con tiempo3=tiempo2+normal_1
     ;CLRF	cambio_modos
     
-    BSF		funcionar, 0
+    
     CLRF	cambio_colores
     CLRF	cambio_colores_2
     CLRF	verdec
@@ -824,6 +824,7 @@ aceptar:
     CLRF	resta
     CLRF	resta_t1
     CLRF	estado
+    BSF		funcionar, 0
     RETURN
 rechazar:
     BCF		funcionar, 0
