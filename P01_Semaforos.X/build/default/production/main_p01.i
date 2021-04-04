@@ -2521,7 +2521,7 @@ PSECT udata_bank0
     tiempo1: DS 1
     tiempo2: DS 1
     tiempo3: DS 1
-    temporal: DS 1
+
     decenas_t1: DS 1
     unidades_t1: DS 1
     dividendo_t1: DS 1
@@ -2534,15 +2534,13 @@ PSECT udata_bank0
     decenas_temp: DS 1
     unidades_temp: DS 1
     dividendo_temp: DS 1
-    verde_normal: DS 1
-    verde_titilante: DS 1
+
+
     amarillo: DS 1
-    contador: DS 1
-    display_seven: DS 2
+
+
     resta_t1: DS 1
-    tiempo_rojo_t1: DS 2
-    tiempo_rojo_t2: DS 2
-    tiempo_rojo_t3: DS 2
+
     cambio_modos: DS 1
     normal_1: DS 1
     normal_2: DS 1
@@ -2556,22 +2554,12 @@ PSECT udata_bank0
 
     cambio_colores: DS 1
     cambio_colores_2: DS 1
-    verde_t1: DS 1
-    verde_titilante_t1: DS 1
-    amarillo_t1: DS 1
-    rojo_t1: DS 1
-    verde_t2: DS 1
-    verde_titilante_t2: DS 1
-    amarillo_t2: DS 1
-    rojo_t2: DS 1
-    verde_t3: DS 1
-    verde_titilante_t3: DS 1
-    amarillo_t3: DS 1
-    rojo_t3: DS 1
+
+
 
     funcionar: DS 1
     delay_small: DS 1
-    ver1: DS 1
+
 
     resta: DS 1
     verdec: DS 1
@@ -2974,196 +2962,196 @@ regresar:
 
 colores:
 
-    btfsc cambio_colores, 0
-    goto sema02
+    BTFSC cambio_colores, 0
+    GOTO sema02
 
-    btfsc cambio_colores, 1
-    goto sema03
+    BTFSC cambio_colores, 1
+    GOTO sema03
 
-    btfsc cambio_colores, 2
-    goto sema04
+    BTFSC cambio_colores, 2
+    GOTO sema04
 
-    btfsc cambio_colores, 3
-    goto sema05
+    BTFSC cambio_colores, 3
+    GOTO sema05
 
-    btfsc cambio_colores, 4
-    goto sema06
+    BTFSC cambio_colores, 4
+    GOTO sema06
 
-    btfsc cambio_colores, 5
-    goto sema07
+    BTFSC cambio_colores, 5
+    GOTO sema07
 
-    btfsc cambio_colores, 6
-    goto sema08
+    BTFSC cambio_colores, 6
+    GOTO sema08
 
-    btfsc cambio_colores, 7
-    goto sema09
+    BTFSC cambio_colores, 7
+    GOTO sema09
 
-    btfsc cambio_colores_2, 0
-    goto reseteo
+    BTFSC cambio_colores_2, 0
+    GOTO reseteo
 
 sema01:
-    bcf STATUS, 2
-    bcf PORTA, 0 ; Rojo s1
-    bcf PORTA, 1 ; Amarillo s1
-    bsf PORTA, 2 ; Verde s1
-    bsf PORTA, 3 ; Rojo s2
-    bcf PORTA, 4 ; Amarillo s2
-    bcf PORTA, 5 ; Verde s2
-    bsf PORTB, 5 ; Rojo s3
-    bcf PORTB, 6 ; Amarillo s3
-    bcf PORTB, 7 ; Verde s3
+    BCF STATUS, 2
+    BCF PORTA, 0 ; Rojo s1
+    BCF PORTA, 1 ; Amarillo s1
+    BSF PORTA, 2 ; Verde s1
+    BSF PORTA, 3 ; Rojo s2
+    BCF PORTA, 4 ; Amarillo s2
+    BCF PORTA, 5 ; Verde s2
+    BSF PORTB, 5 ; Rojo s3
+    BCF PORTB, 6 ; Amarillo s3
+    BCF PORTB, 7 ; Verde s3
 
-    movf tiempo1, w
-    movwf verdec
-    movlw 6
-    subwf verdec, 1
-    movf verdec, w
-    movwf resta
-    movf resta_t1, w
-    subwf verdec, 1
-    btfss STATUS, 2
-    goto $+3
-    bcf PORTA, 2
-    bsf cambio_colores, 0
-    return
+    MOVF tiempo1, w
+    MOVWF verdec
+    MOVLW 6
+    SUBWF verdec, 1
+    MOVF verdec, w
+    MOVWF resta
+    MOVF resta_t1, w
+    SUBWF verdec, 1
+    BTFSS STATUS, 2
+    GOTO $+3
+    BCF PORTA, 2
+    BSF cambio_colores, 0
+    RETURN
 sema02:
-    bcf STATUS, 2
-    bsf PORTA, 2
+    BCF STATUS, 2
+    BSF PORTA, 2
     delay
-    bcf PORTA, 2
-    movlw 3
-    addwf resta, w
-    movwf verdet
-    movf resta_t1, w
-    subwf verdet, 1
-    btfss STATUS, 2
-    goto $+3
-    bcf cambio_colores, 0
-    bsf cambio_colores, 1
-    return
+    BCF PORTA, 2
+    MOVLW 3
+    ADDWF resta, w
+    MOVWF verdet
+    MOVF resta_t1, w
+    SUBWF verdet, 1
+    BTFSS STATUS, 2
+    GOTO $+3
+    BCF cambio_colores, 0
+    BSF cambio_colores, 1
+    RETURN
 sema03:
-    bcf STATUS, 2
-    bsf PORTA, 1
-    movlw 6
-    addwf resta, w
-    movwf amarillo
-    movf resta_t1, w
-    subwf amarillo, 1
-    btfss STATUS, 2
-    goto $+5
-    bcf cambio_colores, 1
-    bsf cambio_colores, 2
-    bcf PORTA, 1
+    BCF STATUS, 2
+    BSF PORTA, 1
+    MOVLW 6
+    ADDWF resta, w
+    MOVWF amarillo
+    MOVF resta_t1, w
+    SUBWF amarillo, 1
+    BTFSS STATUS, 2
+    GOTO $+5
+    BCF cambio_colores, 1
+    BSF cambio_colores, 2
+    BCF PORTA, 1
     CLRF resta_t1
-    return
+    RETURN
 sema04:
-    bcf STATUS, 2
-    bcf PORTA, 3
-    bsf PORTA, 0
-    bsf PORTA, 5
-    movf tiempo2, w
-    movwf verdec
-    movlw 6
-    subwf verdec, 1
-    movf verdec, w
-    movwf resta
-    movf resta_t1, w
-    subwf verdec, 1
-    btfss STATUS, 2
-    goto $+4
-    bcf PORTA, 5
-    bcf cambio_colores, 2
-    bsf cambio_colores, 3
-    return
+    BCF STATUS, 2
+    BCF PORTA, 3
+    BSF PORTA, 0
+    BSF PORTA, 5
+    MOVF tiempo2, w
+    MOVWF verdec
+    MOVLW 6
+    SUBWF verdec, 1
+    MOVF verdec, w
+    MOVWF resta
+    MOVF resta_t1, w
+    SUBWF verdec, 1
+    BTFSS STATUS, 2
+    GOTO $+4
+    BCF PORTA, 5
+    BCF cambio_colores, 2
+    BSF cambio_colores, 3
+    RETURN
 sema05:
-    bcf STATUS, 2
-    bsf PORTA, 5
+    BCF STATUS, 2
+    BCF PORTA, 5
     delay
-    bcf PORTA, 5
-    movlw 3
-    addwf resta, w
-    movwf verdet
-    movf resta_t1, w
-    subwf verdet, 1
-    btfss STATUS, 2
-    goto $+3
-    bcf cambio_colores, 3
-    bsf cambio_colores, 4
-    return
+    BCF PORTA, 5
+    MOVLW 3
+    ADDWF resta, w
+    MOVWF verdet
+    MOVF resta_t1, w
+    SUBWF verdet, 1
+    BTFSS STATUS, 2
+    GOTO $+3
+    BCF cambio_colores, 3
+    BSF cambio_colores, 4
+    RETURN
 sema06:
-    bcf STATUS, 2
-    bsf PORTA, 4
-    movlw 6
-    addwf resta, w
-    movwf amarillo
-    movf resta_t1, w
-    subwf amarillo, 1
-    btfss STATUS, 2
-    goto $+5
-    bcf cambio_colores, 4
-    bsf cambio_colores, 5
-    bcf PORTA, 4
+    BCF STATUS, 2
+    BSF PORTA, 4
+    MOVLW 6
+    ADDWF resta, w
+    MOVWF amarillo
+    MOVF resta_t1, w
+    SUBWF amarillo, 1
+    BTFSS STATUS, 2
+    GOTO $+5
+    BCF cambio_colores, 4
+    BSF cambio_colores, 5
+    BCF PORTA, 4
     CLRF resta_t1
-    return
+    RETURN
 sema07:
-    bcf STATUS, 2
-    bcf PORTB, 5 ;ROJO S3
-    bsf PORTA, 3
-    bsf PORTB, 7 ;VERDE S3
-    movf tiempo2, w
-    movwf verdec
-    movlw 5
-    subwf verdec, 1
-    movf verdec, w
-    movwf resta
-    movf resta_t1, w
-    subwf verdec, 1
-    btfss STATUS, 2
-    goto $+4
-    bcf PORTB, 7
-    bcf cambio_colores, 5
-    bsf cambio_colores, 6
-    return
+    BCF STATUS, 2
+    BCF PORTB, 5 ;ROJO S3
+    BSF PORTA, 3
+    BSF PORTB, 7 ;VERDE S3
+    MOVF tiempo2, w
+    MOVWF verdec
+    MOVLW 5
+    SUBWF verdec, 1
+    MOVF verdec, w
+    MOVWF resta
+    MOVF resta_t1, w
+    SUBWF verdec, 1
+    BTFSS STATUS, 2
+    GOTO $+4
+    BCF PORTB, 7
+    BCF cambio_colores, 5
+    BSF cambio_colores, 6
+    RETURN
 sema08:
-    bcf STATUS, 2
-    bsf PORTB, 7
+    BCF STATUS, 2
+    BSF PORTB, 7
     delay
-    bcf PORTB, 7
-    movlw 3
-    addwf resta, w
-    movwf verdet
-    movf resta_t1, w
-    subwf verdet, 1
-    btfss STATUS, 2
-    goto $+3
-    bcf cambio_colores, 6
-    bsf cambio_colores, 7
-    return
+    BCF PORTB, 7
+    MOVLW 3
+    ADDWF resta, w
+    MOVWF verdet
+    MOVF resta_t1, w
+    SUBWF verdet, 1
+    BTFSS STATUS, 2
+    GOTO $+3
+    BCF cambio_colores, 6
+    BSF cambio_colores, 7
+    RETURN
 sema09:
-    bcf STATUS, 2
-    bsf PORTB, 6
-    movlw 6
-    addwf resta, w
-    movwf amarillo
-    movf resta_t1, w
-    subwf amarillo, 1
-    btfss STATUS, 2
-    goto $+6
-    bcf cambio_colores, 7
-    bsf cambio_colores_2, 0
-    bcf PORTB, 6
-    bsf PORTB, 5
+    BCF STATUS, 2
+    BSF PORTB, 6
+    MOVLW 6
+    ADDWF resta, w
+    MOVWF amarillo
+    MOVF resta_t1, w
+    SUBWF amarillo, 1
+    BTFSS STATUS, 2
+    GOTO $+6
+    BCF cambio_colores, 7
+    BSF cambio_colores_2, 0
+    BCF PORTB, 6
+    BSF PORTB, 5
     CLRF resta_t1
-    return
+    RETURN
 reseteo:
-    clrf verdec
-    clrf verdet
-    clrf amarillo
-    clrf resta
-    clrf cambio_colores
-    bcf cambio_colores_2, 0
-    ;clrf STATUS
-    return
+    CLRF verdec
+    CLRF verdet
+    CLRF amarillo
+    CLRF resta
+    CLRF cambio_colores
+    BCF cambio_colores_2, 0
+    ;CLRF STATUS
+    RETURN
 
 
 

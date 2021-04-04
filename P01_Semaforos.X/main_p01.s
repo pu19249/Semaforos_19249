@@ -72,7 +72,6 @@ PSECT udata_bank0
     tiempo1:		    DS 1
     tiempo2:		    DS 1
     tiempo3:		    DS 1
-    temporal:		    DS 1
     decenas_t1:		    DS 1
     unidades_t1:	    DS 1
     dividendo_t1:	    DS 1
@@ -85,15 +84,8 @@ PSECT udata_bank0
     decenas_temp:	    DS 1
     unidades_temp:	    DS 1
     dividendo_temp:	    DS 1
-    verde_normal:	    DS 1
-    verde_titilante:	    DS 1
     amarillo:		    DS 1
-    contador:		    DS 1
-    display_seven:	    DS 2
     resta_t1:		    DS 1
-    tiempo_rojo_t1:	    DS 2
-    tiempo_rojo_t2:	    DS 2
-    tiempo_rojo_t3:	    DS 2
     cambio_modos:	    DS 1
     normal_1:		    DS 1
     normal_2:		    DS 1
@@ -104,26 +96,10 @@ PSECT udata_bank0
     tiempo_1_temporal:	    DS 1
     tiempo_2_temporal:	    DS 1
     tiempo_3_temporal:	    DS 1
-	
     cambio_colores:	    DS 1
     cambio_colores_2:	    DS 1
-    verde_t1:		    DS 1
-    verde_titilante_t1:	    DS 1
-    amarillo_t1:	    DS 1
-    rojo_t1:		    DS 1
-    verde_t2:		    DS 1
-    verde_titilante_t2:	    DS 1
-    amarillo_t2:	    DS 1
-    rojo_t2:		    DS 1
-    verde_t3:		    DS 1
-    verde_titilante_t3:	    DS 1
-    amarillo_t3:	    DS 1
-    rojo_t3:		    DS 1
-	
     funcionar:		    DS 1
-    delay_small:	    DS 1
-    ver1:		    DS 1
-    
+    delay_small:	    DS 1   
     resta:		    DS 1
     verdec:		    DS 1
     verdet:		    DS 1
