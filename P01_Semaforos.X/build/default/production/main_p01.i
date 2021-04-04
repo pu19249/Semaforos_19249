@@ -2521,7 +2521,6 @@ PSECT udata_bank0
     tiempo1: DS 1
     tiempo2: DS 1
     tiempo3: DS 1
-
     decenas_t1: DS 1
     unidades_t1: DS 1
     dividendo_t1: DS 1
@@ -2534,13 +2533,8 @@ PSECT udata_bank0
     decenas_temp: DS 1
     unidades_temp: DS 1
     dividendo_temp: DS 1
-
-
     amarillo: DS 1
-
-
     resta_t1: DS 1
-
     cambio_modos: DS 1
     normal_1: DS 1
     normal_2: DS 1
@@ -2551,16 +2545,10 @@ PSECT udata_bank0
     tiempo_1_temporal: DS 1
     tiempo_2_temporal: DS 1
     tiempo_3_temporal: DS 1
-
     cambio_colores: DS 1
     cambio_colores_2: DS 1
-
-
-
     funcionar: DS 1
     delay_small: DS 1
-
-
     resta: DS 1
     verdec: DS 1
     verdet: DS 1
@@ -2748,30 +2736,30 @@ main:
 
 loop:
 
-    BTFSC funcionar, 0
-    CALL colores
+    BTFSC funcionar, 0 ;esto va a servir para detenerlo cuando acepte cambios
+    CALL colores ;aqui esta el cambio de los semaforos
    ;revisar a que modo me voy
     MOVLW 1
     SUBWF cambio_modos, 0 ;para que no se altere el valor en la variable
     BTFSC STATUS, 2
-    CALL config_v1
+    CALL config_v1 ;se va a la configuracion del tiempo 1
     MOVLW 2
     SUBWF cambio_modos, 0 ;para que no se altere el valor en la variable
     BTFSC STATUS, 2
-    CALL config_v2
+    CALL config_v2 ;se va a la configuracion del tiempo 2
     MOVLW 3
     SUBWF cambio_modos, 0 ;para que no se altere el valor en la variable
     BTFSC STATUS, 2
-    CALL config_v3
+    CALL config_v3 ;se va a la configuracion del tiempo 3
     MOVLW 4
     SUBWF cambio_modos, 0 ;para que no se altere el valor en la variable
     BTFSC STATUS, 2
-    CALL aceptar_rechazar
+    CALL aceptar_rechazar ;el modo de aceptar o rechazar
     MOVLW 5
-    SUBWF cambio_modos, 0
+    SUBWF cambio_modos, 0 ;revisa si hubo otro botonazo
     BTFSC STATUS, 2
-    CLRF cambio_modos
-
+    CLRF cambio_modos ;limpia la variable para que cambie de modos
+   ;llamo a todas mis divisiones y la parte de los display
     CALL division_decenas_t1
     CALL division_decenas_t2
     CALL division_decenas_t3
@@ -2887,32 +2875,32 @@ division_unidades_temp:
 modos:
     BTFSS PORTB, 0
     INCF cambio_modos ;con esto reviso mi cambio de modos con restas
-
+    ;en el loop principal
 
     ;revisar si quiero incrementar mi tiempo
     BTFSS PORTB, 1
-    INCF tiempo_general ;le suma 1 al tiempo1
+    INCF tiempo_general ;le suma 1 al tiempo general
     MOVLW 21
     SUBWF tiempo_general, 0
     BTFSS STATUS, 2 ;mira si ya llego a 20
     GOTO $+3
-    MOVLW 10 ;mueve 10 a tiempo1 (valor decimal)
+    MOVLW 10 ;mueve 10 a tiempo (valor decimal)
     MOVWF tiempo_general
 
     ;revisar si quiero decrementar mi tiempo
     BTFSS PORTB, 2
-    DECF tiempo_general
+    DECF tiempo_general ;decrementa en 1 el tiempo general
     MOVLW 9
     SUBWF tiempo_general, 0
-    BTFSS STATUS, 2
+    BTFSS STATUS, 2 ;mira si ya llego a 10
     GOTO $+3
-    MOVLW 20
+    MOVLW 20 ;si si mueve 20 al tiempo
     MOVWF tiempo_general
     RETURN
 
 
 reiniciar_tmr1:
-    BTFSC ((PIR1) and 07Fh), 0
+    BTFSC ((PIR1) and 07Fh), 0 ;le cargo un segundo al timer1
     BANKSEL TMR1L
     MOVLW 0x7C
     MOVWF TMR1L
@@ -2922,18 +2910,18 @@ reiniciar_tmr1:
     ;DECF tiempo2
     ;DECF tiempo3
     INCF resta_t1 ;para el cambio de los colores
-    BTFSC estado, 0
+    BTFSC estado, 0 ;para que vaya decrementando uno por uno
     GOTO dec_tiempo2
 
     BTFSC estado, 1
     GOTO dec_tiempo3
 
 dec_tiempo1:
-    DECF tiempo1
+    DECF tiempo1 ;decrementa el tiempo 1 cargado en main y cambios
     BTFSS STATUS, 2
-    GOTO regresar
-    MOVF normal_1, 0
-    MOVWF tiempo1
+    GOTO regresar ;si ya llego a cero se pasa al otro tiempo
+    MOVF normal_1, 0 ;sino le mueve el valor cargado para que espere
+    MOVWF tiempo1 ;a decrementarse de nuevo
     BSF estado, 0
     RETURN
 
@@ -2961,7 +2949,7 @@ regresar:
 
 
 colores:
-
+    ;la misma logica de los display con banderas
     BTFSC cambio_colores, 0
     GOTO sema02
 
@@ -3001,29 +2989,29 @@ sema01:
     BCF PORTB, 6 ; Amarillo s3
     BCF PORTB, 7 ; Verde s3
 
-    MOVF tiempo1, w
-    MOVWF verdec
-    MOVLW 6
-    SUBWF verdec, 1
-    MOVF verdec, w
-    MOVWF resta
-    MOVF resta_t1, w
-    SUBWF verdec, 1
+    MOVF tiempo1, 0 ;muevo el valor a w
+    MOVWF verdec ;para operarlo en la variable verde solido
+    MOVLW 6 ;3 seg de titilante y 3 de amarillo
+    SUBWF verdec, 1 ;decremento
+    MOVF verdec, 0 ;muevo el resultado a W
+    MOVWF resta ;lo muevo a otra variable
+    MOVF resta_t1, 0 ;y esta es la que se incrementa en el timer1
+    SUBWF verdec, 1 ;para restarlo con el tiempo del solido
     BTFSS STATUS, 2
     GOTO $+3
-    BCF PORTA, 2
+    BCF PORTA, 2 ;apago la led verde (comienza titileo)
     BSF cambio_colores, 0
     RETURN
 sema02:
     BCF STATUS, 2
     BSF PORTA, 2
-    delay
+    delay ;macro para titilar
     BCF PORTA, 2
-    MOVLW 3
-    ADDWF resta, w
-    MOVWF verdet
-    MOVF resta_t1, w
-    SUBWF verdet, 1
+    MOVLW 3 ;son 3 segundos de titilante
+    ADDWF resta, 0 ;aqui se cuanto tiempo llevaba y para saber cuanto tiempo
+    MOVWF verdet ;permanece en titilante o en solido
+    MOVF resta_t1, 0
+    SUBWF verdet, 1 ;ya paso el tiempo de titilar
     BTFSS STATUS, 2
     GOTO $+3
     BCF cambio_colores, 0
@@ -3031,19 +3019,19 @@ sema02:
     RETURN
 sema03:
     BCF STATUS, 2
-    BSF PORTA, 1
+    BSF PORTA, 1 ;ahora quiero encender la luz amarilla de los semaforos
     MOVLW 6
-    ADDWF resta, w
+    ADDWF resta, w ;nuevamente el tiempo que llevaba para los otros semaforos
     MOVWF amarillo
     MOVF resta_t1, w
-    SUBWF amarillo, 1
+    SUBWF amarillo, 1 ;para saber si ya paso el tiempo del amarillo
     BTFSS STATUS, 2
     GOTO $+5
     BCF cambio_colores, 1
     BSF cambio_colores, 2
-    BCF PORTA, 1
-    CLRF resta_t1
-    RETURN
+    BCF PORTA, 1 ;apago el amarillo y luego encendere el rojo y lo
+    CLRF resta_t1 ;misma para los otros semaforos
+    RETURN ;limpio mi incremento para que las restas se hagan nuevamente
 sema04:
     BCF STATUS, 2
     BCF PORTA, 3
@@ -3185,14 +3173,14 @@ mostrar_display:
 
 
 config_v1:
-    BSF funcionar, 1
-    BSF funcionar, 2
+    BSF funcionar, 1 ;esto para que si muestre el disp de
+    BSF funcionar, 2 ;configuracion solo en la 1 2 y 3
     BSF funcionar, 3
-    BCF PORTE, 0
+    BCF PORTE, 0 ;leds indicadores
     BSF PORTE, 1
     BCF PORTE, 2
-    MOVF tiempo_general, 0
-    MOVWF tiempo_1_temporal
+    MOVF tiempo_general, 0 ;el tiempo que inc o dec lo muevo
+    MOVWF tiempo_1_temporal ;a una temporal 1 2 y 3
     RETURN
 
 config_v2:
@@ -3219,21 +3207,21 @@ config_v3:
     RETURN
 
 aceptar_rechazar:
-    BCF funcionar, 1
+    BCF funcionar, 1 ;aqui se apaga el ultimo disp
     BCF funcionar, 2
     BCF funcionar, 3
     BSF PORTE, 0
     BCF PORTE, 1
     BSF PORTE, 2
     ;enviar los tiempos temporales a las variables del modo normal
-    BTFSS PORTB, 1
+    BTFSS PORTB, 1 ;acepto o rechazo dependiendo del boton
     CALL aceptar
     BTFSS PORTB, 2
     CALL rechazar
     RETURN
 aceptar:
-    BCF funcionar, 0
-    BSF PORTE, 0
+    BCF funcionar, 0 ;detengo el funcionamiento por un momento
+    BSF PORTE, 0 ;leds indicadores
     BSF PORTE, 1
     BSF PORTE, 2
     ;colocar todo en rojo
@@ -3253,17 +3241,17 @@ aceptar:
     ;CLRF cambio_modos
 
 
-    CLRF cambio_colores
-    CLRF cambio_colores_2
-    CLRF verdec
+    CLRF cambio_colores ;reseteo todo para que los tiempos
+    CLRF cambio_colores_2 ;y los colores vayan siempre
+    CLRF verdec ;en el orden de los displays
     CLRF verdet
     CLRF amarillo
     CLRF resta
     CLRF resta_t1
-    CLRF estado
-    BSF funcionar, 0
+    CLRF estado ;para que comience desde el disp1 otra vez
+    BSF funcionar, 0 ;regreso a funcionar todo
     RETURN
-rechazar:
+rechazar: ;si rechazo va a seguir funcionando normalmente
     BCF funcionar, 0
     CLRF cambio_modos
     CLRF cambio_colores
@@ -3311,34 +3299,34 @@ display2: ;parte unidades via1
     MOVWF PORTC
     BSF PORTD, 1
     GOTO next2
-display3:
+display3: ;parte decenas via2
     MOVF display+2, 0
     MOVWF PORTC
     BSF PORTD, 2
     GOTO next3
-display4:
+display4: ;parte unidades via2
     MOVF display+3, 0
     MOVWF PORTC
     BSF PORTD, 3
     GOTO next4
-display5:
+display5: ;parte decenas via3
     MOVF display+4, 0
     MOVWF PORTC
     BSF PORTD, 4
     GOTO next5
-display6:
+display6: ;parte unidades via3
     MOVF display+5, 0
     MOVWF PORTC
     BSF PORTD, 5
     GOTO next6
-display7:
-    BTFSS funcionar, 1
+display7: ;configuracion decenas
+    BTFSS funcionar, 1 ;hasta que este activado (config 1 2 y 3) muestra algo
     GOTO next7
     MOVF display+6, 0
     MOVWF PORTC
     BSF PORTD, 6
     GOTO next7
-display8:
+display8: ;configuracion unidades
     BTFSS funcionar, 1
     GOTO next8
     MOVF display+7, 0
