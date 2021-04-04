@@ -295,7 +295,9 @@ main:
     MOVWF	tiempo_general	;
     
     BSF		funcionar, 0
-    CLRF	cambio_colores
+    ;CLRF	cambio_colores
+    ;CLRF	cambio_colores_2
+    
     //</editor-fold>
 
 ;===============================================================================
@@ -306,7 +308,7 @@ main:
 loop:
    
     BTFSC    funcionar, 0
-    CALL     colores
+    CALL     colores_2
    ;revisar a que modo me voy
     MOVLW    1
     SUBWF    cambio_modos, 0	    ;para que no se altere el valor en la variable
@@ -475,7 +477,10 @@ reiniciar_tmr1:
     MOVWF	TMR1L
     MOVLW	0xE1	
     MOVWF	TMR1H
-    INCF	resta_t1	    ;para el cambio de los colores
+    ;DECF	tiempo1
+    ;DECF	tiempo2
+    ;DECF	tiempo3
+    ;INCF	resta_t1	    ;para el cambio de los colores
     BTFSC	estado, 0
     GOTO	dec_tiempo2
     
@@ -513,216 +518,392 @@ dec_tiempo3:
 regresar:
     RETURN//</editor-fold>
 
-//<editor-fold defaultstate="collapsed" desc="cambio de colores semaforos">
-colores:
-   
-    BTFSC	cambio_colores, 0
-    GOTO	sem02
-    
-    BTFSC	cambio_colores, 1
-    GOTO	sem03
-    
-    BTFSC	cambio_colores, 2
-    GOTO	sem04
-    
-    BTFSC	cambio_colores, 3
-    GOTO	sem05
-    
-    BTFSC	cambio_colores, 4
-    GOTO	sem06
-    
-    BTFSC	cambio_colores, 5
-    GOTO	sem07
-    
-    BTFSC	cambio_colores, 6
-    GOTO	sem08
-    
-    BTFSC	cambio_colores, 7
-    GOTO	sem09
-        
-    BTFSC	cambio_colores_2, 0
-    GOTO	sem10
-    
-sem01_inicial:
-    ;esto es para que el verde este solido
-    BCF		STATUS, 2
-    BSF		PORTA, 2	    ;verde s1
-    BSF		PORTA, 3	    ;rojo s2
-    BSF		PORTB, 5	    ;rojo s3
-    BCF		PORTA, 0
-    BCF		PORTA, 1
-    BCF		PORTA, 4
+colores_2:
+    BCF		funcionar, 1
+    BCF		funcionar, 2
+    BCF		funcionar, 3
+    MOVLW	10            ;Si el tiempo en tiempo1 es 10, entonces:
+    SUBWF	tiempo1, 0
+    BTFSC	STATUS, 2
+    BSF		PORTA, 2        ;Encender led verde s1
+    BTFSC	STATUS, 2
+    BCF		PORTA, 0        ;Apagar led roja para el semaforo 1
+    BTFSC	STATUS, 2
+    BSF		PORTA, 3        ;Encender led roja para el semaforo 2
+    BTFSC	STATUS, 2
+    BSF		PORTB, 5        ;Encender led roja para el semaforo 3
+    MOVLW	6            ;Si el tiempo en tiempo1 es 6, entonces:
+    SUBWF	tiempo1, 0
+    BTFSC	STATUS, 2
+    BCF		PORTA, 2        ;Hacer titilar led verde cada cambio de segundo
+    BTFSC	STATUS, 2
+    BSF		PORTA, 2
+    BTFSC	STATUS, 2
+    BCF		PORTA, 2
+    MOVLW	5            ;Hacer titilar led verde
+    SUBWF	tiempo1, 0   
+    BTFSC	STATUS, 2
+    BSF		PORTA, 2
+    BTFSC	STATUS, 2
+    BCF		PORTA, 2
+    BTFSC	STATUS, 2
+    BSF		PORTA, 2
+    MOVLW	4            ;Hacer titilar led verde
+    SUBWF	tiempo1, 0
+    BTFSC	STATUS, 2
+    BCF		PORTA, 2
+    BTFSC	STATUS, 2
+    BSF		PORTA, 2
+    BTFSC	STATUS, 2
+    BCF		PORTA, 2
+    MOVLW	3            ;Si el tiempo en tiempo1 es 3, entonces:
+    SUBWF	tiempo1, 0
+    BTFSC	STATUS, 2
+    BSF		PORTA, 1        ;Encender led amarilla
+    MOVLW	0            ;Si el tiempo en tiempo1 es 0, entonces:
+    SUBWF	tiempo1, 0
+    BTFSC	STATUS, 2
+    BCF		PORTA, 1        ;Apagar led amarilla
+    BTFSC	STATUS, 2
+    MOVLW	0
+    SUBWF	tiempo1, 0
+    BTFSC	STATUS, 2
+    CALL	revisar
+    ;semaforo2
+    MOVLW	10            ;Si el tiempo en tiempo1 es 10, entonces:
+    SUBWF	tiempo2, 0
+    BTFSC	STATUS, 2
+    BSF		PORTA, 5        ;Encender led verde s1
+    BTFSC	STATUS, 2
+    BCF		PORTA, 3        ;Apagar led roja para el semaforo 1=2
+    BTFSC	STATUS, 2
+    BSF		PORTA, 5        ;Encender led roja para el semaforo 2
+    BTFSC	STATUS, 2
+    BSF		PORTB, 5        ;Encender led roja para el semaforo 3
+    MOVLW	6               ;Si el tiempo en tiempo1 es 6, entonces:
+    SUBWF	tiempo2, 0
+    BTFSC	STATUS, 2
+    BCF		PORTA, 5        ;Hacer titilar led verde cada cambio de segundo
+    BTFSC	STATUS, 2
+    BSF		PORTA, 5
+    BTFSC	STATUS, 2
     BCF		PORTA, 5
-    BCF		PORTB, 6
+    MOVLW	5            ;Hacer titilar led verde
+    SUBWF	tiempo2, 0   
+    BTFSC	STATUS, 2
+    BSF		PORTA, 5
+    BTFSC	STATUS, 2
+    BCF		PORTA, 5
+    BTFSC	STATUS, 2
+    BSF		PORTA, 5
+    MOVLW	4            ;Hacer titilar led verde
+    SUBWF	tiempo2, 0
+    BTFSC	STATUS, 2
+    BCF		PORTA, 5
+    BTFSC	STATUS, 2
+    BSF		PORTA, 5
+    BTFSC	STATUS, 2
+    BCF		PORTA, 5
+    MOVLW	3            ;Si el tiempo en tiempo1 es 3, entonces:
+    SUBWF	tiempo2, 0
+    BTFSC	STATUS, 2
+    BSF		PORTA, 4        ;Encender led amarilla
+    MOVLW	0            ;Si el tiempo en tiempo1 es 0, entonces:
+    SUBWF	tiempo2, 0
+    BTFSC	STATUS, 2
+    BCF		PORTA, 4        ;Apagar led amarilla
+    BTFSC	STATUS, 2
+    MOVLW	0
+    SUBWF	tiempo1, 0
+    BTFSC	STATUS, 2
+    CALL	revisar    
+    ;semaforo3
+    MOVLW	10            ;Si el tiempo en tiempo1 es 10, entonces:
+    SUBWF	tiempo3, 0
+    BTFSC	STATUS, 2
+    BSF		PORTB, 7         ;Encender led verde s1
+    BTFSC	STATUS, 2
+    BCF		PORTB, 5        ;Apagar led roja para el semaforo 3
+    BTFSC	STATUS, 2
+    BSF		PORTA, 3        ;Encender led roja para el semaforo 2
+    BTFSC	STATUS, 2
+    BSF		PORTA, 0        ;Encender led roja para el semaforo 3
+    MOVLW	6            ;Si el tiempo en tiempo1 es 6, entonces:
+    SUBWF	tiempo3, 0
+    BTFSC	STATUS, 2
+    BCF		PORTB, 7        ;Hacer titilar led verde cada cambio de segundo
+    BTFSC	STATUS, 2
+    BSF		PORTB, 7
+    BTFSC	STATUS, 2
     BCF		PORTB, 7
-    ;primero para que se mantenga en el verde solido
-    MOVF	tiempo1, 0	
-    MOVWF	verde_t1, 0
-    MOVLW	6
-    SUBWF	verde_t1, 1	;ahora en el tiempo verde_t1 hay tiempo1-6 segundos
-    MOVF	verde_t1, 0
-    MOVWF	ver1		;para saber cuanto llevamos
-    MOVF	resta_t1, 0
-    SUBWF	verde_t1, 1
-    BTFSS	STATUS, 2
-    GOTO	$+2
-    BSF		cambio_colores, 0
+    MOVLW	5            ;Hacer titilar led verde
+    SUBWF	tiempo3, 0   
+    BTFSC	STATUS, 2
+    BSF		PORTB, 7
+    BTFSC	STATUS, 2
+    BCF		PORTB, 7
+    BTFSC	STATUS, 2
+    BSF		PORTB,7
+    MOVLW	4            ;Hacer titilar led verde
+    SUBWF	tiempo3, 0
+    BTFSC	STATUS, 2
+    BCF		PORTB, 7
+    BTFSC	STATUS, 2
+    BSF		PORTB, 7
+    BTFSC	STATUS, 2
+    BCF		PORTB, 7
+    MOVLW	3            ;Si el tiempo en tiempo1 es 3, entonces:
+    SUBWF	tiempo3, 0
+    BTFSC	STATUS, 2
+    BSF		PORTB, 6        ;Encender led amarilla
+    MOVLW	0            ;Si el tiempo en tiempo1 es 0, entonces:
+    SUBWF	tiempo3, 0
+    BTFSC	STATUS, 2
+    BCF		PORTB, 6        ;Apagar led amarilla
+    BTFSC	STATUS, 2
+    MOVLW	0
+    SUBWF	tiempo3, 0
+    BTFSC	STATUS, 2
+    CALL	revisar 
     RETURN
-	
-sem02:
-    ;ahora para el verde titilante (3 segundos por default)
-    BCF	    STATUS, 2
-    MOVLW   3
-    ADDWF   ver1, 0		;el tiempo que llevaba mas 3
-    MOVWF   verde_titilante_t1
-    MOVF    resta_t1, 0
-    SUBWF   verde_titilante_t1, 1
-    BCF	    PORTA, 2
-    delay
-    BSF	    PORTA, 2
-    BTFSS   STATUS, 2
-    GOTO    $+5
-    BCF	    PORTA, 2		    ;verde s1
-    BSF	    PORTA, 1		    ;amarillo s1
-    BCF	    cambio_colores, 0
-    BSF	    cambio_colores, 1
+       
+revisar:
+    MOVLW	0
+    SUBWF	tiempo1, 0
+    BTFSC	STATUS, 2
+    MOVLW	10
+    BTFSC	STATUS, 2
+    MOVWF	tiempo1
+    BSF		PORTA, 0	;rojo s1
+    
+    MOVLW	0
+    SUBWF	tiempo2, 0
+    BTFSC	STATUS, 2
+    MOVLW	10
+    BTFSC	STATUS, 2
+    MOVWF	tiempo2
+    BSF		PORTA, 3	;rojo s2
+    
+    MOVLW	0
+    SUBWF	tiempo3, 0
+    BTFSC	STATUS, 2
+    MOVLW	10
+    BTFSC	STATUS, 2
+    MOVWF	tiempo3
+    BSF		PORTB, 5	;rojo s3
+    
     RETURN
     
-sem03:
-    ;ahora para la parte del amarillo
-    BCF	    STATUS, 2
-    MOVLW   6
-    ADDWF   ver1, 0 
-    MOVWF   amarillo_t1
-    MOVF    resta_t1, 0
-    SUBWF   amarillo_t1, 1
-    BTFSS   STATUS, 2
-    GOTO    $+9
-    BCF	    cambio_colores, 1
-    BSF	    cambio_colores, 2
-    BCF	    PORTA, 1	    ;se apaga el amarillo s1
-    BSF	    PORTA, 0	    ;se enciende el rojo
-    BSF	    PORTA, 5	    ;se enciende verde s2
-    BCF	    PORTA, 3	    ;apago rojo s2
-    MOVLW   0
-    MOVWF   resta_t1
-    RETURN
-sem04:
-    ;esto es para que el verde este solido
-    BCF		STATUS, 2
-    ;primero para que se mantenga en el verde solido
-    MOVF	tiempo2, 0	
-    MOVWF	verde_t1
-    MOVLW	6
-    SUBWF	verde_t1, 1	;ahora en el tiempo verde_t1 hay tiempo1-6 segundos
-    MOVF	verde_t1, 0
-    MOVWF	ver1		;para saber cuanto llevamos
-    MOVF	resta_t1, 0
-    SUBWF	verde_t1, 1
-    BTFSS	STATUS, 2
-    GOTO	$+3
-    BCF		cambio_colores, 2
-    BSF		cambio_colores, 3
-    RETURN
-	
-sem05:
-    ;ahora para el verde titilante del s2
-    BCF	    STATUS, 2
-    MOVLW   3
-    ADDWF   ver1, 0		;el tiempo que llevaba mas 3
-    MOVWF   verde_titilante_t1
-    MOVF    resta_t1, 0
-    SUBWF   verde_titilante_t1, 1
-    BCF	    PORTA, 5		    
-    delay
-    BSF	    PORTA, 5
-    BTFSS   STATUS, 2
-    GOTO    $+5
-    BCF	    PORTA, 5		    ;apago verde s2
-    BSF	    PORTA, 4		    ;amarillo s2
-    BCF	    cambio_colores, 3
-    BSF	    cambio_colores, 4
-    RETURN
-	
-sem06:
-	;ahora amarillo s2
-    BCF	    STATUS, 2
-    MOVLW   6
-    ADDWF   ver1, 0 
-    MOVWF   amarillo_t1
-    MOVF    resta_t1, 0
-    SUBWF   amarillo_t1, 1
-    BTFSS   STATUS, 2
-    GOTO    $+9
-    BCF	    PORTA, 4	    ;apago amarillo s2
-    BSF	    PORTA, 3	    ;enciendo rojo s2
-    BSF	    PORTB, 7	    ;enciendo verde s3
-    BCF	    PORTB, 5	    ;apago rojo s3
-    BCF	    cambio_colores, 4
-    BSF	    cambio_colores, 5
-    MOVLW   0
-    MOVWF   resta_t1
-    RETURN
-    
-sem07: ;verde solido s3
-    ;esto es para que el verde este solido
-    BCF		STATUS, 2
-    ;primero para que se mantenga en el verde solido
-    MOVF    tiempo3, 0	
-    MOVWF   verde_t1
-    MOVLW   6
-    SUBWF   verde_t1, 1	;ahora en el tiempo verde_t1 hay tiempo1-6 segundos
-    MOVF    verde_t1, 0
-    MOVWF   ver1		;para saber cuanto llevamos
-    MOVF    resta_t1, 0
-    SUBWF   verde_t1, 1
-    BTFSS   STATUS, 2
-    GOTO    $+3
-    BCF	    cambio_colores, 5
-    BSF	    cambio_colores, 6
-    RETURN
-    
-sem08:  ;verde titilante s3
-    ;ahora para el verde titilante del s2
-    BCF	    STATUS, 2
-    MOVLW   3
-    ADDWF   ver1, 0		;el tiempo que llevaba mas 3
-    MOVWF   verde_titilante_t1
-    MOVF    resta_t1, 0
-    SUBWF   verde_titilante_t1, 1
-    BCF	    PORTB, 7		    
-    delay
-    BSF	    PORTB, 7
-    BTFSS   STATUS, 2
-    GOTO    $+5
-    BCF	    PORTB, 7	    ;apago verde s2
-    BSF	    PORTB, 6	    ;enciende amarillo s2
-    BCF	    cambio_colores, 6
-    BSF	    cambio_colores, 7
-    RETURN
-    
-sem09:  ;amarillo s3 y regreso a s1
-    BCF	    STATUS, 2
-    MOVLW   6
-    ADDWF   ver1, 0 
-    MOVWF   amarillo_t1
-    MOVF    resta_t1, 0
-    SUBWF   amarillo_t1, 1
-    BTFSS   STATUS, 2
-    GOTO    $+8
-    BSF	    PORTB, 5	    ;enciendo rojo s3
-    BCF	    PORTB, 6	    ;apago amarillo s3
-    BCF	    PORTA, 0	    ;apago rojo s1
-    BCF	    cambio_colores, 7
-    BSF	    cambio_colores_2, 0
-    MOVLW   0
-    MOVWF   resta_t1
-    RETURN
-
-sem10:
-    CLRF    cambio_colores
-    BCF	    cambio_colores_2, 0
-    RETURN
+//<editor-fold defaultstate="collapsed" desc="cambio de colores semaforos">
+;colores:
+;    BTFSC	cambio_colores, 0
+;    GOTO	sem02
+;    
+;    BTFSC	cambio_colores, 1
+;    GOTO	sem03
+;    
+;    BTFSC	cambio_colores, 2
+;    GOTO	sem04
+;    
+;    BTFSC	cambio_colores, 3
+;    GOTO	sem05
+;    
+;    BTFSC	cambio_colores, 4
+;    GOTO	sem06
+;    
+;    BTFSC	cambio_colores, 5
+;    GOTO	sem07
+;    
+;    BTFSC	cambio_colores, 6
+;    GOTO	sem08
+;    
+;    BTFSC	cambio_colores, 7
+;    GOTO	sem09
+;        
+;    BTFSC	cambio_colores_2, 0
+;    GOTO	sem10
+;
+;sem01:
+;    ;esto es para que el verde este solido
+;    BCF		STATUS, 2
+;    BSF		PORTA, 2	    ;verde s1
+;    BSF		PORTA, 3	    ;rojo s2
+;    BSF		PORTB, 5	    ;rojo s3
+;    BCF		PORTA, 0
+;    BCF		PORTA, 1
+;    BCF		PORTA, 4
+;    BCF		PORTA, 5
+;    BCF		PORTB, 6
+;    BCF		PORTB, 7
+;    ;primero para que se mantenga en el verde solido
+;    MOVF	tiempo1, 0	
+;    MOVWF	verde_t1, 0
+;    MOVLW	6
+;    SUBWF	verde_t1, 1	;ahora en el tiempo verde_t1 hay tiempo1-6 segundos
+;    MOVF	verde_t1, 0
+;    MOVWF	ver1		;para saber cuanto llevamos
+;    MOVF	resta_t1, 0
+;    SUBWF	verde_t1, 1
+;    BTFSS	STATUS, 2
+;    GOTO	$+2
+;    BSF		cambio_colores, 0
+;    RETURN
+;	
+;sem02:
+;    ;ahora para el verde titilante (3 segundos por default)
+;    BCF	    STATUS, 2
+;    MOVLW   3
+;    ADDWF   ver1, 0		;el tiempo que llevaba mas 3
+;    MOVWF   verde_titilante_t1
+;    MOVF    resta_t1, 0
+;    SUBWF   verde_titilante_t1, 1
+;    BCF	    PORTA, 2
+;    delay
+;    BSF	    PORTA, 2
+;    BTFSS   STATUS, 2
+;    GOTO    $+5
+;    BCF	    PORTA, 2		    ;verde s1
+;    BSF	    PORTA, 1		    ;amarillo s1
+;    BCF	    cambio_colores, 0
+;    BSF	    cambio_colores, 1
+;    RETURN
+;    
+;sem03:
+;    ;ahora para la parte del amarillo
+;    BCF	    STATUS, 2
+;    MOVLW   6
+;    ADDWF   ver1, 0 
+;    MOVWF   amarillo_t1
+;    MOVF    resta_t1, 0
+;    SUBWF   amarillo_t1, 1
+;    BTFSS   STATUS, 2
+;    GOTO    $+7
+;    BCF	    cambio_colores, 1
+;    BSF	    cambio_colores, 2
+;    BCF	    PORTA, 1	    ;se apaga el amarillo s1
+;    BSF	    PORTA, 0	    ;se enciende el rojo
+;    BSF	    PORTA, 5	    ;se enciende verde s2
+;    BCF	    PORTA, 3	    ;apago rojo s2
+;    MOVLW   0
+;    MOVWF   resta_t1
+;    RETURN
+;sem04:
+;    ;esto es para que el verde este solido
+;    BCF		STATUS, 2
+;    ;primero para que se mantenga en el verde solido
+;    MOVF	tiempo2, 0	
+;    MOVWF	verde_t1
+;    MOVLW	6
+;    SUBWF	verde_t1, 1	;ahora en el tiempo verde_t1 hay tiempo1-6 segundos
+;    MOVF	verde_t1, 0
+;    MOVWF	ver1		;para saber cuanto llevamos
+;    MOVF	resta_t1, 0
+;    SUBWF	verde_t1, 1
+;    BTFSS	STATUS, 2
+;    GOTO	$+3
+;    BCF		cambio_colores, 2
+;    BSF		cambio_colores, 3
+;    RETURN
+;	
+;sem05:
+;    ;ahora para el verde titilante del s2
+;    BCF	    STATUS, 2
+;    MOVLW   3
+;    ADDWF   ver1, 0		;el tiempo que llevaba mas 3
+;    MOVWF   verde_titilante_t1
+;    MOVF    resta_t1, 0
+;    SUBWF   verde_titilante_t1, 1
+;    BCF	    PORTA, 5		    
+;    delay
+;    BSF	    PORTA, 5
+;    BTFSS   STATUS, 2
+;    GOTO    $+5
+;    BCF	    PORTA, 5		    ;apago verde s2
+;    BSF	    PORTA, 4		    ;amarillo s2
+;    BCF	    cambio_colores, 3
+;    BSF	    cambio_colores, 4
+;    RETURN
+;	
+;sem06:
+;	;ahora amarillo s2
+;    BCF	    STATUS, 2
+;    MOVLW   6
+;    ADDWF   ver1, 0 
+;    MOVWF   amarillo_t1
+;    MOVF    resta_t1, 0
+;    SUBWF   amarillo_t1, 1
+;    BTFSS   STATUS, 2
+;    GOTO    $+7
+;    BCF	    PORTA, 4	    ;apago amarillo s2
+;    BSF	    PORTA, 3	    ;enciendo rojo s2
+;    BSF	    PORTB, 7	    ;enciendo verde s3
+;    BCF	    PORTB, 5	    ;apago rojo s3
+;    BCF	    cambio_colores, 4
+;    BSF	    cambio_colores, 5
+;    MOVLW   0
+;    MOVWF   resta_t1
+;    RETURN
+;    
+;sem07: ;verde solido s3
+;    ;esto es para que el verde este solido
+;    BCF		STATUS, 2
+;    ;primero para que se mantenga en el verde solido
+;    MOVF    tiempo3, 0	
+;    MOVWF   verde_t1
+;    MOVLW   6
+;    SUBWF   verde_t1, 1	;ahora en el tiempo verde_t1 hay tiempo1-6 segundos
+;    MOVF    verde_t1, 0
+;    MOVWF   ver1		;para saber cuanto llevamos
+;    MOVF    resta_t1, 0
+;    SUBWF   verde_t1, 1
+;    BTFSS   STATUS, 2
+;    GOTO    $+3
+;    BCF	    cambio_colores, 5
+;    BSF	    cambio_colores, 6
+;    RETURN
+;    
+;sem08:  ;verde titilante s3
+;    ;ahora para el verde titilante del s2
+;    BCF	    STATUS, 2
+;    MOVLW   3
+;    ADDWF   ver1, 0		;el tiempo que llevaba mas 3
+;    MOVWF   verde_titilante_t1
+;    MOVF    resta_t1, 0
+;    SUBWF   verde_titilante_t1, 1
+;    BCF	    PORTB, 7		    
+;    delay
+;    BSF	    PORTB, 7
+;    BTFSS   STATUS, 2
+;    GOTO    $+5
+;    BCF	    PORTB, 7	    ;apago verde s2
+;    BSF	    PORTB, 6	    ;enciende amarillo s2
+;    BCF	    cambio_colores, 6
+;    BSF	    cambio_colores, 7
+;    RETURN
+;    
+;sem09:  ;amarillo s3 y regreso a s1
+;    BCF	    STATUS, 2
+;    MOVLW   6
+;    ADDWF   ver1, 0 
+;    MOVWF   amarillo_t1
+;    MOVF    resta_t1, 0
+;    SUBWF   amarillo_t1, 1
+;    BTFSS   STATUS, 2
+;    GOTO    $+6
+;    BSF	    PORTB, 5	    ;enciendo rojo s3
+;    BCF	    PORTB, 6	    ;apago amarillo s3
+;    BCF	    PORTA, 0	    ;apago rojo s1
+;    BCF	    cambio_colores, 7
+;    BSF	    cambio_colores_2, 0
+;    MOVLW   0
+;    MOVWF   resta_t1
+;    RETURN
+;
+;sem10:
+;    CLRF    cambio_colores
+;    BCF	    cambio_colores_2, 0
+;    CLRF    ver1
+;    RETURN
     //</editor-fold>
     
 //<editor-fold defaultstate="collapsed" desc="mostrar display">
@@ -756,6 +937,9 @@ mostrar_display:
     
 //<editor-fold defaultstate="collapsed" desc="modos de configuracion">
 config_v1:
+    BSF		funcionar, 1
+    BSF		funcionar, 2
+    BSF		funcionar, 3
     BCF		PORTE, 0
     BSF		PORTE, 1
     BCF		PORTE, 2
@@ -764,6 +948,9 @@ config_v1:
     RETURN
     
 config_v2:
+    BSF		funcionar, 1
+    BSF		funcionar, 2
+    BSF		funcionar, 3
     BSF		PORTE, 0
     BSF		PORTE, 1
     BCF		PORTE, 2
@@ -772,6 +959,9 @@ config_v2:
     RETURN
     
 config_v3:
+    BSF		funcionar, 1
+    BSF		funcionar, 2
+    BSF		funcionar, 3
     BCF		PORTE, 0
     BCF		PORTE, 1
     BSF		PORTE, 2
@@ -781,6 +971,9 @@ config_v3:
     RETURN
     
 aceptar_rechazar:
+    BCF		funcionar, 1
+    BCF		funcionar, 2
+    BCF		funcionar, 3
     BSF		PORTE, 0
     BCF		PORTE, 1
     BSF		PORTE, 2
@@ -796,16 +989,20 @@ aceptar:
     BSF	PORTE, 0
     BSF	PORTE, 1
     BSF	PORTE, 2
-	;colocar todo en rojo
-    MOVF	tiempo_1_temporal, 0
-    MOVWF	tiempo1
-    MOVWF	normal_1
-    MOVF	tiempo_2_temporal, 0
-    MOVWF	tiempo2
-    MOVWF	normal_2
-    MOVF	tiempo_3_temporal, 0
-    MOVWF	tiempo3
-    MOVWF	normal_3
+    ;colocar todo en rojo
+    MOVF	tiempo_1_temporal, 0	    ;el tiempo que inc o dec
+    MOVWF	tiempo1			    ;esto se muestra en el disp
+    MOVWF	normal_1		    ;con esto opero
+    MOVF	tiempo_2_temporal, 0	    ;el tiempo que inc o dec
+    MOVWF	tiempo2			    ;esto se muestra en el disp
+    MOVWF	normal_2		    ;con esto opero
+    ;MOVF	normal_1, 0		    ;normal_1 a W para sumarlo con 
+    ;ADDWF	tiempo2			    ;tiempo2 entonces tiempo2=normal_1+tiempo2
+    MOVF	tiempo_3_temporal, 0	    ;el tiempo que inc o dec
+    MOVWF	tiempo3			    ;esto se muestra en el disp
+    MOVWF	normal_3		    ;con esto opero
+    ;MOVF	tiempo2, 0		    ;tiempo2 a w, es decir normal_1+tiempo2
+    ;ADDWF	tiempo3			    ;sumado con tiempo3=tiempo2+normal_1
     ;CLRF	cambio_modos
     BSF		funcionar, 0
     RETURN
@@ -876,11 +1073,15 @@ display6:
     BSF		PORTD, 5
     GOTO	next6
 display7:
+    BTFSS	funcionar, 1
+    GOTO	next7
     MOVF	display+6, 0
     MOVWF	PORTC
     BSF		PORTD, 6
     GOTO	next7
 display8:
+    BTFSS	funcionar, 1
+    GOTO	next8
     MOVF	display+7, 0
     MOVWF	PORTC
     BSF		PORTD, 7
