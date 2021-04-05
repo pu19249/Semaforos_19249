@@ -281,6 +281,7 @@ main:
     MOVWF	variable_tiempo
     MOVLW	6
     MOVWF	variable_tiempo_2
+   
     ;CLRF	cambio_colores
     ;CLRF	cambio_colores_2
     
@@ -504,7 +505,7 @@ dec_tiempo3:
 regresar:
     RETURN//</editor-fold>
        
-//<editor-fold defaultstate="collapsed" desc="cambio de colores semaforos">
+//<editor-fold defaultstate="collapsed" desc="cambio de colores semaforos">  
 colores:
     ;la misma logica de los display con banderas
     BTFSC   cambio_colores, 0
@@ -545,10 +546,10 @@ sema01:
     BSF	    PORTB, 5	; Rojo s3
     BCF	    PORTB, 6	; Amarillo s3
     BCF	    PORTB, 7	; Verde s3
-    MOVF    tiempo1, 0	    ;muevo el valor a w
+    MOVF    normal_1, 0	    ;muevo el valor a w (utilizar la variable para operaciones)
     MOVWF   verdec	    ;para operarlo en la variable verde solido
-    ;MOVLW   2		    ;3 seg de titilante y 3 de amarillo			;-----------------------
-    MOVF    variable_tiempo, 0
+    MOVLW   6		    ;3 seg de titilante y 3 de amarillo			
+    ;MOVF    variable_tiempo, 0
     SUBWF   verdec, 1	    ;decremento
     MOVF    verdec, 0	    ;muevo el resultado a W
     MOVWF   resta	    ;lo muevo a otra variable
@@ -594,10 +595,10 @@ sema04:
     BCF	    PORTA, 3
     BSF	    PORTA, 0
     BSF	    PORTA, 5
-    MOVF    tiempo2, w
+    MOVF    normal_2, w
     MOVWF   verdec 
-    ;MOVLW   2									;-----------------------
-    MOVF    variable_tiempo, 0
+    MOVLW   6									
+    ;MOVF    variable_tiempo, 0
     SUBWF   verdec, 1
     MOVF    verdec, w
     MOVWF   resta
@@ -644,10 +645,10 @@ sema07:
     BCF	    PORTB, 5	    ;ROJO S3
     BSF	    PORTA, 3
     BSF	    PORTB, 7	    ;VERDE S3
-    MOVF    tiempo2, w
+    MOVF    normal_2, w
     MOVWF   verdec 
-    ;MOVLW   6									;------------------------
-    MOVF    variable_tiempo_2, 0
+    MOVLW   5									
+    ;MOVF    variable_tiempo_2, 0
     SUBWF   verdec, 1
     MOVF    verdec, w
     MOVWF   resta
@@ -697,6 +698,7 @@ reseteo:
     CLRF    resta
     CLRF    cambio_colores
     BCF     cambio_colores_2, 0
+    CLRF    STATUS
     RETURN
     //</editor-fold>
     
