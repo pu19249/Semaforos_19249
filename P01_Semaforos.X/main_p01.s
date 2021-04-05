@@ -103,6 +103,8 @@ PSECT udata_bank0
     resta:		    DS 1
     verdec:		    DS 1
     verdet:		    DS 1
+    variable_tiempo:	    DS 1
+    variable_tiempo_2:	    DS 1
 
 PSECT udata_shr
     W_TEMP:		    DS 1
@@ -275,6 +277,10 @@ main:
     MOVWF	tiempo_general	;
     
     BSF		funcionar, 0
+    MOVLW	2
+    MOVWF	variable_tiempo
+    MOVLW	6
+    MOVWF	variable_tiempo_2
     ;CLRF	cambio_colores
     ;CLRF	cambio_colores_2
     
@@ -539,10 +545,10 @@ sema01:
     BSF	    PORTB, 5	; Rojo s3
     BCF	    PORTB, 6	; Amarillo s3
     BCF	    PORTB, 7	; Verde s3
-    
     MOVF    tiempo1, 0	    ;muevo el valor a w
     MOVWF   verdec	    ;para operarlo en la variable verde solido
-    MOVLW   6		    ;3 seg de titilante y 3 de amarillo
+    ;MOVLW   2		    ;3 seg de titilante y 3 de amarillo			;-----------------------
+    MOVF    variable_tiempo, 0
     SUBWF   verdec, 1	    ;decremento
     MOVF    verdec, 0	    ;muevo el resultado a W
     MOVWF   resta	    ;lo muevo a otra variable
@@ -590,7 +596,8 @@ sema04:
     BSF	    PORTA, 5
     MOVF    tiempo2, w
     MOVWF   verdec 
-    MOVLW   6
+    ;MOVLW   2									;-----------------------
+    MOVF    variable_tiempo, 0
     SUBWF   verdec, 1
     MOVF    verdec, w
     MOVWF   resta
@@ -604,7 +611,7 @@ sema04:
     RETURN
 sema05:
     BCF	    STATUS, 2
-    BCF	    PORTA, 5
+    BSF	    PORTA, 5
     delay
     BCF	    PORTA, 5
     MOVLW   3
@@ -637,9 +644,10 @@ sema07:
     BCF	    PORTB, 5	    ;ROJO S3
     BSF	    PORTA, 3
     BSF	    PORTB, 7	    ;VERDE S3
-    MOVF    tiempo2, w
+    MOVF    tiempo3, w
     MOVWF   verdec 
-    MOVLW   5
+    ;MOVLW   6									;------------------------
+    MOVF    variable_tiempo_2, 0
     SUBWF   verdec, 1
     MOVF    verdec, w
     MOVWF   resta
@@ -689,7 +697,6 @@ reseteo:
     CLRF    resta
     CLRF    cambio_colores
     BCF     cambio_colores_2, 0
-    ;CLRF    STATUS
     RETURN
     //</editor-fold>
     
@@ -771,10 +778,10 @@ aceptar_rechazar:
     CALL	rechazar
     RETURN
 aceptar:
-    BCF	funcionar, 0		;detengo el funcionamiento por un momento
-    BSF	PORTE, 0		;leds indicadores
-    BSF	PORTE, 1
-    BSF	PORTE, 2
+    BCF		funcionar, 0		;detengo el funcionamiento por un momento
+    BSF		PORTE, 0		;leds indicadores
+    BSF		PORTE, 1
+    BSF		PORTE, 2
     ;colocar todo en rojo
     MOVF	tiempo_1_temporal, 0	    ;el tiempo que inc o dec
     MOVWF	tiempo1			    ;esto se muestra en el disp
@@ -794,12 +801,21 @@ aceptar:
     
     CLRF	cambio_colores		    ;reseteo todo para que los tiempos
     CLRF	cambio_colores_2	    ;y los colores vayan siempre
-    CLRF	verdec			    ;en el orden de los displays
-    CLRF	verdet		    
-    CLRF	amarillo
+    ;CLRF	verdec			    ;en el orden de los displays
+    ;CLRF	verdet		    
+    ;CLRF	amarillo
     CLRF	resta
-    CLRF	resta_t1		    
+    MOVLW	0
+    MOVWF	resta_t1
     CLRF	estado			    ;para que comience desde el disp1 otra vez
+    
+;    MOVLW	8
+;    SUBWF	tiempo1, 0
+;    MOVWF	variable_tiempo
+;    
+;    MOVLW	6
+;    SUBWF	tiempo3, 0
+;    MOVWF	variable_tiempo_2
     BSF		funcionar, 0		    ;regreso a funcionar todo
     RETURN
 rechazar:				    ;si rechazo va a seguir funcionando normalmente
