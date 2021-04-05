@@ -822,8 +822,8 @@ aceptar:
 rechazar:				    ;si rechazo va a seguir funcionando normalmente
     BCF		funcionar, 0
     CLRF	cambio_modos
-    CLRF	cambio_colores
-    CLRF	cambio_colores_2
+    ;CLRF	cambio_colores
+    ;CLRF	cambio_colores_2
     BSF		funcionar, 0
     RETURN//</editor-fold>
 

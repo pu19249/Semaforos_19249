@@ -13,7 +13,7 @@
 %PSECTS
 $build/default/production/main_p01.o
 resVect code 0 0 0 3 2
-code CODE 0 0 0 374 2
+code CODE 0 0 0 372 2
 intVect code 0 0 0 14 2
 udata_bank0 BANK0 1 20 20 2E 1
 udata_shr COMMON 1 70 70 2 1
@@ -32,14 +32,14 @@ BANK0 4E-6F 1
 BANK1 A0-EF 1
 BANK2 110-16F 1
 BANK3 190-1EF 1
-CONST 374-1FFF 2
-ENTRY 374-1FFF 2
+CONST 372-1FFF 2
+ENTRY 372-1FFF 2
 IDLOC 2000-2003 2
-CODE 374-1FFF 2
+CODE 372-1FFF 2
 COMMON 72-7F 1
 EEDATA 2100-21FF 2
-STRCODE 374-1FFF 2
-STRING 374-1FFF 2
+STRCODE 372-1FFF 2
+STRING 372-1FFF 2
 # %LINETAB Section
 # This section enumerates the file/line to address mappings.
 # The beginning of the section is indicated by %LINETAB.
@@ -638,102 +638,100 @@ F intVect code >141:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforo
 321 code CODE >822:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
 321 code CODE >823:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
 322 code CODE >824:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-323 code CODE >825:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-324 code CODE >826:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-325 code CODE >827:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-326 code CODE >828:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-327 code CODE >835:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-327 code CODE >836:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-32A code CODE >837:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-32B code CODE >839:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-32C code CODE >840:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-32D code CODE >842:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-32E code CODE >843:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-32F code CODE >845:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-330 code CODE >846:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-331 code CODE >848:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-332 code CODE >849:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-333 code CODE >851:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-334 code CODE >852:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-335 code CODE >854:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-336 code CODE >855:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-337 code CODE >857:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-338 code CODE >858:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-339 code CODE >860:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-339 code CODE >861:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-33A code CODE >862:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-33B code CODE >863:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-33C code CODE >864:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-33D code CODE >865:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-33D code CODE >866:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-33E code CODE >867:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-33F code CODE >868:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-340 code CODE >869:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-341 code CODE >870:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-341 code CODE >871:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-342 code CODE >872:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-343 code CODE >873:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-344 code CODE >874:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-345 code CODE >875:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-345 code CODE >876:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-346 code CODE >877:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-347 code CODE >878:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-348 code CODE >879:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-349 code CODE >880:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-349 code CODE >881:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-34A code CODE >882:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-34B code CODE >883:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-34C code CODE >884:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-34D code CODE >885:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-34D code CODE >886:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-34E code CODE >887:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-34F code CODE >888:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-350 code CODE >889:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-351 code CODE >890:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-351 code CODE >891:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-352 code CODE >892:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-353 code CODE >893:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-354 code CODE >894:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-355 code CODE >895:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-356 code CODE >896:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-357 code CODE >897:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-357 code CODE >898:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-358 code CODE >899:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-359 code CODE >900:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-35A code CODE >901:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-35B code CODE >902:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-35C code CODE >903:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-35D code CODE >906:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-35D code CODE >907:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-35E code CODE >908:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-35F code CODE >909:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-360 code CODE >910:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-360 code CODE >911:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-361 code CODE >912:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-362 code CODE >913:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-363 code CODE >914:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-363 code CODE >915:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-364 code CODE >916:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-365 code CODE >917:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-366 code CODE >918:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-366 code CODE >919:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-367 code CODE >920:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-368 code CODE >921:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-369 code CODE >922:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-369 code CODE >923:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-36A code CODE >924:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-36B code CODE >925:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-36C code CODE >926:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-36C code CODE >927:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-36D code CODE >928:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-36E code CODE >929:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-36F code CODE >930:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-36F code CODE >931:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-370 code CODE >932:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-371 code CODE >933:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-372 code CODE >934:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-372 code CODE >935:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
-373 code CODE >936:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+323 code CODE >827:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+324 code CODE >828:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+325 code CODE >835:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+325 code CODE >836:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+328 code CODE >837:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+329 code CODE >839:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+32A code CODE >840:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+32B code CODE >842:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+32C code CODE >843:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+32D code CODE >845:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+32E code CODE >846:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+32F code CODE >848:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+330 code CODE >849:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+331 code CODE >851:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+332 code CODE >852:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+333 code CODE >854:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+334 code CODE >855:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+335 code CODE >857:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+336 code CODE >858:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+337 code CODE >860:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+337 code CODE >861:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+338 code CODE >862:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+339 code CODE >863:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+33A code CODE >864:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+33B code CODE >865:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+33B code CODE >866:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+33C code CODE >867:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+33D code CODE >868:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+33E code CODE >869:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+33F code CODE >870:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+33F code CODE >871:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+340 code CODE >872:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+341 code CODE >873:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+342 code CODE >874:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+343 code CODE >875:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+343 code CODE >876:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+344 code CODE >877:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+345 code CODE >878:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+346 code CODE >879:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+347 code CODE >880:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+347 code CODE >881:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+348 code CODE >882:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+349 code CODE >883:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+34A code CODE >884:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+34B code CODE >885:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+34B code CODE >886:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+34C code CODE >887:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+34D code CODE >888:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+34E code CODE >889:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+34F code CODE >890:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+34F code CODE >891:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+350 code CODE >892:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+351 code CODE >893:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+352 code CODE >894:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+353 code CODE >895:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+354 code CODE >896:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+355 code CODE >897:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+355 code CODE >898:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+356 code CODE >899:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+357 code CODE >900:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+358 code CODE >901:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+359 code CODE >902:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+35A code CODE >903:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+35B code CODE >906:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+35B code CODE >907:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+35C code CODE >908:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+35D code CODE >909:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+35E code CODE >910:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+35E code CODE >911:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+35F code CODE >912:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+360 code CODE >913:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+361 code CODE >914:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+361 code CODE >915:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+362 code CODE >916:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+363 code CODE >917:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+364 code CODE >918:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+364 code CODE >919:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+365 code CODE >920:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+366 code CODE >921:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+367 code CODE >922:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+367 code CODE >923:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+368 code CODE >924:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+369 code CODE >925:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+36A code CODE >926:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+36A code CODE >927:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+36B code CODE >928:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+36C code CODE >929:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+36D code CODE >930:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+36D code CODE >931:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+36E code CODE >932:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+36F code CODE >933:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+370 code CODE >934:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+370 code CODE >935:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
+371 code CODE >936:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforos.X\main_p01.s
 # %SYMTAB Section
 # An enumeration of all symbols in the program.
 # The beginning of the section is indicated by %SYMTAB.
@@ -746,7 +744,7 @@ F intVect code >141:C:\Users\jpu20\Documents\GitHub\Semaforos_19249\P01_Semaforo
 # was defined in a psect then <psect> will be "-". File-name
 # is the name of the object file in which the symbol was defined.
 %SYMTAB
-__Hspace_0 374 0 ABS 0 - -
+__Hspace_0 372 0 ABS 0 - -
 __Hspace_1 72 0 ABS 0 - -
 __Hspace_3 0 0 ABS 0 - -
 __Hspace_4 4010 0 ABS 0 - -
