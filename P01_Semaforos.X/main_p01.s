@@ -6,7 +6,7 @@
 ; Hardware: traffic_lights, 8 display 7seg, 3leds para indicar el modo de 
 ; de funcionamiento, 3 push para modo, inc y dec
 ; Creado: 15 de marzo de 2021
-; Ultima modificacion: ____________________________________
+; Ultima modificacion: 05 de abril de 2021
 
 PROCESSOR 16F887
 #include <xc.inc>

@@ -9,7 +9,7 @@
 ; Hardware: traffic_lights, 8 display 7seg, 3leds para indicar el modo de
 ; de funcionamiento, 3 push para modo, inc y dec
 ; Creado: 15 de marzo de 2021
-; Ultima modificacion: ____________________________________
+; Ultima modificacion: 05 de abril de 2021
 
 PROCESSOR 16F887
 
@@ -2995,9 +2995,9 @@ sema01:
     BSF PORTB, 5 ; Rojo s3
     BCF PORTB, 6 ; Amarillo s3
     BCF PORTB, 7 ; Verde s3
-    MOVF normal_1, 0 ;muevo el valor a w
+    MOVF normal_1, 0 ;muevo el valor a w (utilizar la variable para operaciones)
     MOVWF verdec ;para operarlo en la variable verde solido
-    MOVLW 6 ;3 seg de titilante y 3 de amarillo ;-----------------------
+    MOVLW 6 ;3 seg de titilante y 3 de amarillo
     ;MOVF variable_tiempo, 0
     SUBWF verdec, 1 ;decremento
     MOVF verdec, 0 ;muevo el resultado a W
@@ -3046,7 +3046,7 @@ sema04:
     BSF PORTA, 5
     MOVF normal_2, w
     MOVWF verdec
-    MOVLW 6 ;-----------------------
+    MOVLW 6
     ;MOVF variable_tiempo, 0
     SUBWF verdec, 1
     MOVF verdec, w
@@ -3096,7 +3096,7 @@ sema07:
     BSF PORTB, 7 ;VERDE S3
     MOVF normal_2, w
     MOVWF verdec
-    MOVLW 5 ;------------------------
+    MOVLW 5
     ;MOVF variable_tiempo_2, 0
     SUBWF verdec, 1
     MOVF verdec, w
