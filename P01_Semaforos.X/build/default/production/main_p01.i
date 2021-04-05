@@ -3093,7 +3093,7 @@ sema07:
     BCF PORTB, 5 ;ROJO S3
     BSF PORTA, 3
     BSF PORTB, 7 ;VERDE S3
-    MOVF tiempo3, w
+    MOVF tiempo2, w
     MOVWF verdec
     ;MOVLW 6 ;------------------------
     MOVF variable_tiempo_2, 0
@@ -3250,21 +3250,20 @@ aceptar:
 
     CLRF cambio_colores ;reseteo todo para que los tiempos
     CLRF cambio_colores_2 ;y los colores vayan siempre
-    ;CLRF verdec ;en el orden de los displays
-    ;CLRF verdet
-    ;CLRF amarillo
+    CLRF verdec ;en el orden de los displays
+    CLRF verdet
+    CLRF amarillo
     CLRF resta
-    MOVLW 0
-    MOVWF resta_t1
+    CLRF resta_t1
     CLRF estado ;para que comience desde el disp1 otra vez
 
-; MOVLW 8
-; SUBWF tiempo1, 0
-; MOVWF variable_tiempo
+    MOVLW 6
+    SUBWF tiempo1, 0
+    MOVWF variable_tiempo
 ;
-; MOVLW 6
-; SUBWF tiempo3, 0
-; MOVWF variable_tiempo_2
+    MOVLW 4
+    SUBWF tiempo2, 0
+    MOVWF variable_tiempo_2
     BSF funcionar, 0 ;regreso a funcionar todo
     RETURN
 rechazar: ;si rechazo va a seguir funcionando normalmente
